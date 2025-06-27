@@ -56,6 +56,11 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+## Security
+```bash
+npx snyk test
+```
+
 
 ## Deployment
 
