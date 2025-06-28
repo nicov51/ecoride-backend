@@ -178,12 +178,15 @@ CREATE TABLE parameter (
                            FOREIGN KEY (configuration_id) REFERENCES configuration(id)
 );
 
+
+
 INSERT INTO role (label) VALUES
                              ('chauffeur'),
                              ('passager');
 
+
 INSERT INTO user (
-    name, first_name, email, password, phone, address, birth_date, pseudo, is_verified
+    name, firstName, email, password, phone, address, birthDate, pseudo, isVerified
 ) VALUES
       ('Durand', 'Pierre', 'pierre.durand@example.com', 'hashedpwd1', '0601020304', '10 rue de Paris', '1990-04-12', 'pierro', true),
       ('Martin', 'Sophie', 'sophie.martin@example.com', 'hashedpwd2', '0611223344', '15 rue du Havre', '1988-09-25', 'soso', true),
@@ -193,24 +196,24 @@ INSERT INTO user (
 INSERT INTO user_roles_role (user_id, role_id) VALUES (1, 1);
 
 -- Sophie est passager
-INSERT INTO user_roles_role (user_id, role_id) VALUES (2, 2);
+INSERT INTO user_roles_role (userId, roleId) VALUES (2, 2);
 
 -- David est à la fois passager et chauffeur
-INSERT INTO user_roles_role (user_id, role_id) VALUES (3, 1), (3, 2);
+INSERT INTO user_roles_role (userId, roleId) VALUES (3, 1), (3, 2);
 
 INSERT INTO brand (name) VALUES
                              ('Peugeot'),
                              ('Renault'),
                              ('Tesla');
 
--- Pierre (user_id: 1) a une Peugeot
+-- Pierre (userId: 1) a une Peugeot
 INSERT INTO car (
-    model, registration, fuel, color, first_registration, brand_id, owner_id
+    model, registration, fuel, color, firstRegistration, brandId, ownerId
 ) VALUES
     ('208', 'AB-123-CD', 'DIESEL', 'bleue', '2018-06-01', 1, 1);
 
--- David (user_id: 3) a une Tesla
+-- David (userId: 3) a une Tesla
 INSERT INTO car (
-    model, registration, fuel, color, first_registration, brand_id, owner_id
+    model, registration, fuel, color, firstRegistration, brandId, ownerId
 ) VALUES
     ('Model 3', 'EF-456-GH', 'ELECTRIC', 'noir', '2022-03-15', 3, 3);
