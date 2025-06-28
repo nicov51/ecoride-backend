@@ -3,8 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
-
+import { ModelsModule } from './models/models.module';
 
 @Module({
   imports: [
@@ -13,7 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       envFilePath: ['.env.local', '.env'],
     }), // charge .env
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'mariadb',
       host: process.env.MYSQL_HOST,
       port: parseInt(process.env.MYSQL_PORT || '3306'),
       username: process.env.MYSQL_USER,
@@ -22,6 +21,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true, // à désactiver en prod
     }),
+    ModelsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

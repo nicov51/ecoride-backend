@@ -1,0 +1,179 @@
+@startuml MLD
+
+entity User {
+  *id : int
+  --
+  name : string
+  firstName : string
+  email : string
+  password : string
+  phone : string
+  address : string
+  birthDate : date
+  pseudo : string
+  picture : blob
+  isVerified : boolean
+  wallet_id : int
+}
+
+entity Role {
+  *id : int
+  --
+  label : string
+}
+
+entity user_roles {
+  *user_id : int
+  *role_id : int
+}
+
+entity Wallet {
+  *id : int
+  --
+  balance : float
+  createdAt : datetime
+  platform_id : int
+}
+
+entity Platform {
+  *id : int
+  --
+  name : string
+}
+
+entity Transaction {
+  *id : int
+  --
+  amount : float
+  type : string
+  date : datetime
+  description : string
+  wallet_id : int
+}
+
+entity Notification {
+  *id : int
+  --
+  content : string
+  read : boolean
+  createdAt : datetime
+  user_id : int
+}
+
+entity Car {
+  *id : int
+  --
+  model : string
+  registration : string
+  fuel : string
+  color : string
+  firstRegistration : date
+  brand_id : int
+  owner_id : int
+}
+
+entity Brand {
+  *id : int
+  --
+  name : string
+}
+
+entity CarpoolZone {
+  *id : int
+  --
+  label : string
+  lat : float
+  lng : float
+  type : string
+}
+
+entity Ride {
+  *id : int
+  --
+  departureDate : date
+  departurePlace : string
+  arrivalDate : date
+  arrivalPlace : string
+  departureTime : time
+  arrivalTime : time
+  seats : int
+  price : float
+  status : string
+  driver_id : int
+  car_id : int
+  departureZoneId : int
+  arrivalZoneId : int
+}
+
+entity Participation {
+  *id : int
+  --
+  status : string
+  joinedAt : datetime
+  user_id : int
+  ride_id : int
+}
+
+entity Review {
+  *id : int
+  --
+  comment : string
+  rating : int
+  status : string
+  user_id : int
+  ride_id : int
+}
+
+entity SearchHistory {
+  *id : int
+  --
+  departure : string
+  arrival : string
+  searchDate : datetime
+  passengers : int
+  preferences : string
+  user_id : int
+}
+
+entity Configuration {
+  *id : int
+  --
+  name : string
+  description : string
+  updated_by_id : int
+}
+
+entity Parameter {
+  *id : int
+  --
+  key : string
+  value : string
+  configuration_id : int
+}
+
+' Relations
+
+User --{ user_roles
+Role --{ user_roles
+
+User ||--o{ Notification
+User ||--o{ Participation
+User ||--o{ Review
+User ||--o{ SearchHistory
+User ||--|| Wallet
+User ||--o{ Car
+
+Wallet ||--o{ Transaction
+Wallet }o--|| Platform
+
+Car }o--|| Brand
+Car ||--o{ Ride
+
+Ride ||--o{ Participation
+Ride ||--o{ Review
+Ride }o--|| CarpoolZone : departureZoneId
+Ride }o--|| CarpoolZone : arrivalZoneId
+
+Configuration ||--o{ Parameter
+
+@enduml
