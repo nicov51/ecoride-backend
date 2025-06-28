@@ -1,0 +1,169 @@
+@startuml
+
+' Configuration globale
+class Configuration {
+  +id : int
+  +name : string
+  +description : string
+}
+
+class Parameter {
+  +id : int
+  +key : string
+  +value : string
+}
+
+Configuration "1" -- "0..*" Parameter : has
+Configuration "0..1" --> "1" User : updated_by
+
+' Utilisateurs & rôles
+class User {
+  +id : int
+  +name : string
+  +firstName : string
+  +email : string
+  +password : string
+  +phone : string
+  +address : string
+  +birthDate : date
+  +picture : blob
+  +pseudo : string
+  +isVerified : boolean
+}
+
+class Role {
+  +id : int
+  +label : string
+}
+
+User "1" -- "0..*" Role : has
+
+' Wallet & Transactions
+class Wallet {
+  +id : int
+  +balance : float
+  +createdAt : datetime
+}
+
+class Transaction {
+  +id : int
+  +walletId : int
+  +amount : float
+  +type : string
+  +date : datetime
+  +description : string
+}
+
+Wallet "1" -- "0..*" Transaction : logs
+User "1" --> "1" Wallet : owns
+
+' Plateforme
+class Platform {
+  +id : int
+  +name : string
+}
+
+Platform "1" --> "1" Wallet : owns
+
+' Notifications
+class Notification {
+  +id : int
+  +content : string
+  +read : boolean
+  +createdAt : datetime
+}
+
+User "1" -- "0..*" Notification : receives
+
+' Voitures
+class Car {
+  +id : int
+  +model : string
+  +registration : string
+  +fuel : FuelType
+  +color : string
+  +firstRegistration : date
+}
+
+enum FuelType {
+  ELECTRIC
+  DIESEL
+  GASOLINE
+}
+
+class Brand {
+  +id : int
+  +name : string
+}
+
+Car "1" --> "1" Brand : has
+User "1" -- "0..*" Car : owns
+
+' Zones de covoiturage
+class CarpoolZone {
+  +id : int
+  +label : string
+  +lat : float
+  +lng : float
+  +type : string // 'departure' ou 'arrival'
+}
+
+' Covoiturages
+class Ride {
+  +id : int
+  +departureDate : date
+  +departurePlace : string
+  +arrivalDate : date
+  +arrivalPlace : string
+  +departureTime : time
+  +arrivalTime : time
+  +seats : int
+  +price : float
+  +status : string
+  +departureZoneId : int
+  +arrivalZoneId : int
+}
+
+Ride "1" --> "1" User : driver
+Ride "1" --> "1" Car : with
+Ride "1" --> "1" CarpoolZone : departs_from
+Ride "1" --> "1" CarpoolZone : arrives_to
+
+' Participation à un trajet
+class Participation {
+  +id : int
+  +status : string
+  +joinedAt : datetime
+}
+
+User "1" -- "0..*" Participation
+Ride "1" -- "0..*" Participation
+Participation "1" --> "1" User
+Participation "1" --> "1" Ride
+
+' Avis
+class Review {
+  +id : int
+  +comment : string
+  +rating : int
+  +status : string
+}
+
+User "1" -- "0..*" Review : writes
+Ride "1" -- "0..*" Review : receives
+Review "1" --> "1" User
+Review "1" --> "1" Ride
+
+' Historique de recherche
+class SearchHistory {
+  +id : int
+  +departure : string
+  +arrival : string
+  +searchDate : datetime
+  +passengers : int
+  +preferences : string // JSON si besoin
+}
+
+User "1" -- "0..*" SearchHistory : searched
+
+@enduml

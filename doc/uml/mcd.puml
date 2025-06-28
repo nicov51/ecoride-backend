@@ -1,0 +1,164 @@
+@startuml MCD
+
+' Entités principales
+entity User {
+  *id : int
+  --
+  name : string
+  firstName : string
+  email : string
+  password : string
+  phone : string
+  address : string
+  birthDate : date
+  picture : blob
+  pseudo : string
+  isVerified : boolean
+}
+
+entity Role {
+  *id : int
+  --
+  label : string
+}
+
+entity Car {
+  *id : int
+  --
+  model : string
+  registration : string
+  fuel : string
+  color : string
+  firstRegistration : date
+}
+
+entity Brand {
+  *id : int
+  --
+  name : string
+}
+
+entity Wallet {
+  *id : int
+  --
+  balance : float
+  createdAt : datetime
+}
+
+entity Transaction {
+  *id : int
+  --
+  amount : float
+  type : string
+  date : datetime
+  description : string
+}
+
+entity Platform {
+  *id : int
+  --
+  name : string
+}
+
+entity Notification {
+  *id : int
+  --
+  content : string
+  read : boolean
+  createdAt : datetime
+}
+
+entity Ride {
+  *id : int
+  --
+  departureDate : date
+  departurePlace : string
+  arrivalDate : date
+  arrivalPlace : string
+  departureTime : time
+  arrivalTime : time
+  seats : int
+  price : float
+  status : string
+}
+
+entity CarpoolZone {
+  *id : int
+  --
+  label : string
+  lat : float
+  lng : float
+  type : string
+}
+
+entity Participation {
+  *id : int
+  --
+  status : string
+  joinedAt : datetime
+}
+
+entity Review {
+  *id : int
+  --
+  comment : string
+  rating : int
+  status : string
+}
+
+entity SearchHistory {
+  *id : int
+  --
+  departure : string
+  arrival : string
+  searchDate : datetime
+  passengers : int
+  preferences : string
+}
+
+entity Configuration {
+  *id : int
+  --
+  name : string
+  description : string
+}
+
+entity Parameter {
+  *id : int
+  --
+  key : string
+  value : string
+}
+
+' Associations
+User -- {0..*} Role : has
+User -- Wallet : owns
+User -- {0..*} Notification : receives
+User -- {0..*} Car : owns
+User -- {0..*} Participation : participates
+User -- {0..*} Review : writes
+User -- {0..*} SearchHistory : searched
+User -- Configuration : updated
+
+Brand -- {1} Car : brand_of
+Car -- {1} Brand : belongs_to
+
+Car -- Ride : used_for
+Ride -- User : driver
+Ride -- CarpoolZone : departure_zone
+Ride -- CarpoolZone : arrival_zone
+Ride -- {0..*} Participation : has
+Ride -- {0..*} Review : receives
+
+Wallet -- {0..*} Transaction : logs
+Platform -- Wallet : funds
+
+Participation -- Ride : related_ride
+Participation -- User : related_user
+
+Review -- Ride : about
+Review -- User : written_by
+
+Configuration -- {0..*} Parameter : has
+
+@enduml
