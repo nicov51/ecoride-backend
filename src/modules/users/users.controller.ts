@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserResponseDto } from '../../dto/user-response.dto';
-import { CreateUserDto } from '../../dto/create-user.dto';
+import { RegisterDto } from '../../dto/register.dto';
 
 @Controller('users')
 export class UsersController {
@@ -15,7 +15,7 @@ export class UsersController {
     return user ? new UserResponseDto(user) : null;
   }
   @Post()
-  async createUser(@Body() data: CreateUserDto): Promise<UserResponseDto> {
+  async createUser(@Body() data: RegisterDto): Promise<UserResponseDto> {
     const user = await this.usersService.create(data);
     return new UserResponseDto(user);
   }

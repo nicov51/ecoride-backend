@@ -6,9 +6,10 @@ import {
   IsBoolean,
   IsDateString,
   IsPhoneNumber,
+  Length,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterDto {
   @IsEmail()
   email: string;
 
@@ -19,6 +20,7 @@ export class CreateUserDto {
   firstName: string;
 
   @IsString()
+  @Length(6)
   password: string;
 
   @IsNotEmpty()
