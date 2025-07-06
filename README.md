@@ -57,9 +57,8 @@ npm run start:dev
 
 ```bash
 docker exec -it ecoride-app sh
-
-npm run start:dev
 ```
+
 
 ## Run tests
 
