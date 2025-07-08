@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  console.log('Adapter type:', app.getHttpAdapter().getType());
   //prefixe /api à toutes les routes
   app.setGlobalPrefix('api');
   // Pour autoriser le frontend
