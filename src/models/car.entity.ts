@@ -26,7 +26,7 @@ export class Car {
   color: string;
 
   @Column({ type: 'date' })
-  firstRegistration: string;
+  firstRegistration: Date;
 
   @ManyToOne(() => Brand, (brand) => brand.cars)
   brand: Brand;
