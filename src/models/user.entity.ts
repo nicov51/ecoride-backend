@@ -40,7 +40,7 @@ export class User {
   address: string;
 
   @Column({ type: 'date' })
-  birthDate: string;
+  birthDate: Date;
 
   @Column({ type: 'blob', nullable: true })
   picture: Buffer;

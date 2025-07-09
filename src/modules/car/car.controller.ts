@@ -12,7 +12,7 @@ import { CarService } from './car.service';
 import { CreateCarDto } from '../../dto/create-car.dto';
 import { UpdateCarDto } from '../../dto/update-car.dto';
 
-@Controller('car')
+@Controller('cars')
 export class CarController {
   constructor(private readonly carService: CarService) {}
   @Post()
@@ -20,16 +20,16 @@ export class CarController {
     return this.carService.create(createCarDto);
   }
   @Get()
-  findByUser(@Query('userId') userId: number) {
-    return this.carService.findAllByUser(userId);
+  findByUser(@Query('userId') userId: string) {
+    return this.carService.findAllByUser(+userId);
   }
   @Patch(':id')
   update(@Param('id') id: number, @Body() dto: UpdateCarDto) {
     return this.carService.update(+id, dto);
   }
-  //nest inject @Param et @Query en string donc on converti en number avec +id
+  //nest inject @Param et @Query en string donc on parse +id
   @Delete(':id')
-  delete(@Param('id') id: number, @Query('userId') userId: number) {
+  delete(@Param('id') id: string, @Query('userId') userId: string) {
     return this.carService.delete(+id, +userId);
   }
 }

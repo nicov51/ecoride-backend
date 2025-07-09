@@ -18,8 +18,12 @@ export class CarService {
     const owner = await this.userRepository.findOne({
       where: { id: dto.ownerId },
     });
-    if (!owner) throw new Error('User no found');
-    const car = this.carRepository.create({ ...dto, owner });
+    if (!owner) throw new NotFoundException('Utilisateur non trouvé');
+    const car = this.carRepository.create({
+      ...dto,
+      firstRegistration: new Date(dto.firstRegistration),
+      owner,
+    });
     return this.carRepository.save(car);
   }
 
@@ -45,7 +49,7 @@ export class CarService {
     const car = await this.carRepository.findOne({
       where: { id, owner: { id: userId } },
     });
-    if (!car) throw new Error('Car does not exist');
+    if (!car) throw new NotFoundException('La voiture existe pas');
     await this.carRepository.remove(car);
   }
 }

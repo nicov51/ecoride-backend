@@ -8,6 +8,7 @@ import {
   IsPhoneNumber,
   Length,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class RegisterDto {
   @IsEmail()
@@ -27,7 +28,8 @@ export class RegisterDto {
   address: string;
 
   @IsDateString()
-  birthDate: string;
+  @Type(() => Date)
+  birthDate: Date;
 
   @IsOptional()
   picture?: string;

@@ -23,16 +23,16 @@ export class Ride {
   departurePlace: string;
 
   @Column({ type: 'date' })
-  arrivalDate: string;
+  arrivalDate: Date;
 
   @Column()
   arrivalPlace: string;
 
   @Column({ type: 'time' })
-  departureTime: string;
+  departureTime: Date;
 
   @Column({ type: 'time' })
-  arrivalTime: string;
+  arrivalTime: Date;
 
   @Column()
   seats: number;

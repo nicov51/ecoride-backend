@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty, IsString, IsDateString } from 'class-validator';
 import { FuelType } from '../models/car.entity';
+import { Type } from 'class-transformer';
 
 export class CreateCarDto {
   @IsString()
@@ -15,7 +16,8 @@ export class CreateCarDto {
   color: string;
 
   @IsDateString()
-  firstRegistration: string;
+  @Type(() => Date)
+  firstRegistration: Date;
 
   @IsNotEmpty()
   ownerId: number;
