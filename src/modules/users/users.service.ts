@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../models/user.entity';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from '../../dto/register.dto';
 import { Wallet } from '../../models/wallet.entity';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class UsersService {
@@ -13,21 +14,22 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Wallet)
     private readonly walletRepository: Repository<Wallet>,
+    private readonly rolesService: RolesService,
   ) {}
 
   //Todo verif si l'email existe deja
   async create(data: RegisterDto): Promise<User> {
     const saltRounds = 9;
     const hashedPassword = await bcrypt.hash(data.password, saltRounds);
-
-    // Créer l'utilisateur d'abord
+    // Créer l'utilisateur sans role
     const user = this.userRepository.create({
       ...data,
       password: hashedPassword,
       picture: undefined,
     });
     await this.userRepository.save(user);
-
+    // Assigner le rôle Passenger
+    await this.rolesService.addRoleToUser(user.id, 'Passenger');
     // Puis créer le wallet avec la référence user
     const wallet = this.walletRepository.create({
       balance: 20,

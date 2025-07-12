@@ -5,6 +5,7 @@ import { Car } from '../../models/car.entity';
 import { User } from '../../models/user.entity';
 import { CreateCarDto } from '../../dto/create-car.dto';
 import { UpdateCarDto } from '../../dto/update-car.dto';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class CarService {
@@ -13,6 +14,7 @@ export class CarService {
     private readonly carRepository: Repository<Car>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly rolesService: RolesService,
   ) {}
   async create(dto: CreateCarDto): Promise<Car> {
     const owner = await this.userRepository.findOne({
@@ -24,7 +26,10 @@ export class CarService {
       firstRegistration: new Date(dto.firstRegistration),
       owner,
     });
-    return this.carRepository.save(car);
+    await this.carRepository.save(car);
+    //assigner le role driver
+    await this.rolesService.assignDriverRole(owner.id);
+    return car;
   }
 
   async findAllByUser(userId: number): Promise<Car[]> {
