@@ -1,0 +1,40 @@
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    container_name: ecoride-app
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.docker
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules  # Empêche l'écrasement des node_modules
+
+  mariadb:
+    image: mariadb:10.11
+    restart: always
+    container_name: ecoride-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: ecoride
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: ecoridedb
+      MYSQL_GRANT: 'ALL PRIVILEGES ON ecoridedb.* TO ecoride@"%"'
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-uroot", "-prootpassword" ]
+      timeout: 20s
+      retries: 3
+
+volumes:
+  mysql_data:

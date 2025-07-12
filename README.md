@@ -44,6 +44,22 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Développement en local (hors Docker)
+
+```bash
+# on laisse la bdd tourner dans docker
+docker compose up mariadb
+
+npm run start:dev
+```
+
+## Developpement dans docker
+
+```bash
+docker exec -it ecoride-app sh
+```
+
+
 ## Run tests
 
 ```bash
@@ -56,6 +72,11 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+## Security
+```bash
+npx snyk test
+```
+
 
 ## Deployment
 
