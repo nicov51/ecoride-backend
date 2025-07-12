@@ -31,9 +31,9 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
-  validateToken(token: string) {
-    return this.jwtService.verify(token);
-  }
+  // validateToken(token: string) {
+  //   return this.jwtService.verify(token);
+  // }
   async register(registerDto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
     return this.usersService.create({

@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Transaction } from './transaction.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class Wallet {
@@ -11,6 +19,10 @@ export class Wallet {
 
   @Column({ type: 'datetime' })
   createdAt: Date;
+
+  @OneToOne(() => User, (user) => user.wallet)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 
   @OneToMany(() => Transaction, (tx) => tx.wallet)
   transactions: Transaction[];

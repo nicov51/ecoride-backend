@@ -55,8 +55,8 @@ export class User {
   @JoinTable()
   roles: Role[];
 
-  @OneToOne(() => Wallet)
-  @JoinColumn()
+  @OneToOne(() => Wallet, (wallet) => wallet.user)
+  @JoinColumn({ name: 'wallet_id' })
   wallet: Wallet;
 
   @OneToMany(() => Notification, (notif) => notif.user)

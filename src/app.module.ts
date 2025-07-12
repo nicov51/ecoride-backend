@@ -7,6 +7,7 @@ import { ModelsModule } from './models/models.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CarModule } from './modules/car/car.module';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CarModule } from './modules/car/car.module';
     UsersModule,
     AuthModule,
     CarModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],
