@@ -13,32 +13,63 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto) {
-    const user = await this.usersService.findByEmail(loginDto.email);
+    // 1. Normalisation des inputs
+    const normalizedEmail = loginDto.email.trim().toLowerCase();
+    const normalizedPassword = loginDto.password.trim();
+
+    // 2. Récupération de l'utilisateur
+    const user = await this.usersService.findByEmail(normalizedEmail);
     if (!user) {
+      console.log(`Login failed: user ${normalizedEmail} not found`);
       throw new UnauthorizedException('Utilisateur non trouvé');
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      loginDto.password,
-      user.password,
+    // 3. Debug approfondi
+    console.log('=== DEBUG LOGIN ===');
+    console.log(
+      `Email input: "${loginDto.email}" → Normalized: "${normalizedEmail}"`,
     );
-    if (!isPasswordValid) {
+    console.log(
+      `Password input: "${loginDto.password}" → Normalized: "${normalizedPassword}"`,
+    );
+    console.log(`Hash in DB: ${user.password.substring(0, 15)}...`);
+
+    // 4. Comparaison sécurisée
+    const isMatch = await bcrypt.compare(normalizedPassword, user.password);
+    console.log(`Password match: ${isMatch}`);
+
+    if (!isMatch) {
+      console.log(`Login failed for ${normalizedEmail}: invalid password`);
       throw new UnauthorizedException('Mot de passe incorrect');
     }
 
-    const payload = { id: user.id, email: user.email };
+    // 5. Génération du token
+    const payload = { id: user.id, email: normalizedEmail };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
-  // validateToken(token: string) {
-  //   return this.jwtService.verify(token);
-  // }
   async register(registerDto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
     return this.usersService.create({
       ...registerDto,
       password: hashedPassword,
     });
+  }
+  // Méthode temporaire pour le AuthService
+  async debugHashCompare() {
+    const user = await this.usersService.findByEmail('jean.dupont@test.com');
+    if (!user) return;
+
+    console.log('Comparaison pour jean.dupont:');
+    console.log('Hash en base:', user.password);
+    console.log(
+      'Compare Test1234!:',
+      await bcrypt.compare('Test1234!', user.password),
+    );
+    console.log(
+      'Compare test1234:',
+      await bcrypt.compare('test1234', user.password),
+    );
   }
 }

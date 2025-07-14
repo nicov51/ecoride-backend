@@ -19,12 +19,10 @@ export class UsersService {
 
   //Todo verif si l'email existe deja
   async create(data: RegisterDto): Promise<User> {
-    const saltRounds = 9;
-    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
     // Créer l'utilisateur sans role
     const user = this.userRepository.create({
       ...data,
-      password: hashedPassword,
+      password: data.password,
       picture: undefined,
     });
     await this.userRepository.save(user);
@@ -47,7 +45,7 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { email },
-      relations: ['wallet'], // Optionnel: charge automatiquement la relation wallet
+      relations: ['wallet', 'roles'], // Optionnel: charge automatiquement la relation wallet
     });
   }
 
