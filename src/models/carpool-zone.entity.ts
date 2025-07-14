@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
+export type CarpoolZoneType = 'departure' | 'arrival';
+
 @Entity()
 export class CarpoolZone {
   @PrimaryGeneratedColumn()
@@ -8,12 +10,12 @@ export class CarpoolZone {
   @Column()
   label: string;
 
-  @Column('double') // pour lat/lng plus précis que float
+  @Column('float')
   lat: number;
 
-  @Column('double')
+  @Column('float')
   lng: number;
 
-  @Column()
-  type: 'departure' | 'arrival'; // ou string, mais union permet de typer
+  @Column({ type: 'enum', enum: ['departure', 'arrival'] })
+  type: CarpoolZoneType;
 }
