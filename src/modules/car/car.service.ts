@@ -5,6 +5,8 @@ import { Car } from '../../models/car.entity';
 import { User } from '../../models/user.entity';
 import { CreateCarDto } from '../../dto/create-car.dto';
 import { UpdateCarDto } from '../../dto/update-car.dto';
+import { RolesService } from '../roles/roles.service';
+import { BrandService } from '../brand/brand.service';
 
 @Injectable()
 export class CarService {
@@ -13,18 +15,26 @@ export class CarService {
     private readonly carRepository: Repository<Car>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly rolesService: RolesService,
+    private readonly brandService: BrandService,
   ) {}
   async create(dto: CreateCarDto): Promise<Car> {
-    const owner = await this.userRepository.findOne({
-      where: { id: dto.ownerId },
-    });
+    const [owner, brand] = await Promise.all([
+      this.userRepository.findOneBy({ id: dto.ownerId }),
+      this.brandService.findOne(dto.brandId),
+    ]);
     if (!owner) throw new NotFoundException('Utilisateur non trouvé');
+    if (!brand) throw new NotFoundException('Marque non trouvée');
     const car = this.carRepository.create({
       ...dto,
       firstRegistration: new Date(dto.firstRegistration),
       owner,
+      brand,
     });
-    return this.carRepository.save(car);
+    await this.carRepository.save(car);
+    //assigner le role driver
+    await this.rolesService.assignDriverRole(owner.id);
+    return car;
   }
 
   async findAllByUser(userId: number): Promise<Car[]> {

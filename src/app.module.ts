@@ -8,6 +8,8 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CarModule } from './modules/car/car.module';
 import { WalletModule } from './wallet/wallet.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { BrandModule } from './modules/brand/brand.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { WalletModule } from './wallet/wallet.module';
     AuthModule,
     CarModule,
     WalletModule,
+    RolesModule,
+    BrandModule,
   ],
   controllers: [AppController],
   providers: [AppService],

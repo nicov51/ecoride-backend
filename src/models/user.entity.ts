@@ -55,7 +55,7 @@ export class User {
   @JoinTable()
   roles: Role[];
 
-  @OneToOne(() => Wallet, (wallet) => wallet.user)
+  @OneToOne(() => Wallet, (wallet) => wallet.user, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'wallet_id' })
   wallet: Wallet;
 

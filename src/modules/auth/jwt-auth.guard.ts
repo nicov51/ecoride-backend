@@ -33,9 +33,12 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify<JwtPayload>(token);
-      request['user'] = payload; // On utilise une assertion de type plutôt que any
+      request.user = payload;
+      console.log('Authentifié :', payload.email); // Debug
       return true;
     } catch (e) {
+      const error = e as Error; // Type assertion
+      console.error('Token invalide :', error.message); // Debug
       throw new UnauthorizedException('Invalid token');
     }
   }

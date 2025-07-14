@@ -21,4 +21,7 @@ export class CreateCarDto {
 
   @IsNotEmpty()
   ownerId: number;
+
+  @IsNotEmpty()
+  brandId: number;
 }
