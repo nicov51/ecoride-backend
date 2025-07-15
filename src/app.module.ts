@@ -10,6 +10,9 @@ import { CarModule } from './modules/car/car.module';
 import { WalletModule } from './wallet/wallet.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { BrandModule } from './modules/brand/brand.module';
+import { RidesModule } from './modules/rides/rides.module';
+import { CarpoolZonesModule } from './modules/carpool-zones/carpool-zones.module';
+import { ParticipationsModule } from './modules/participations/participations.module';
 
 @Module({
   imports: [
@@ -34,6 +37,9 @@ import { BrandModule } from './modules/brand/brand.module';
     WalletModule,
     RolesModule,
     BrandModule,
+    RidesModule,
+    CarpoolZonesModule,
+    ParticipationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

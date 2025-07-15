@@ -17,7 +17,7 @@ export class Ride {
   id: number;
 
   @Column({ type: 'date' })
-  departureDate: string;
+  departureDate: Date;
 
   @Column()
   departurePlace: string;
