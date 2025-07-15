@@ -1,13 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RidesService } from './rides.service';
+import { RideFiltersDto } from '../../dto/ride-filters.dto';
 
 @Controller('rides')
 export class RidesController {
@@ -24,4 +18,8 @@ export class RidesController {
   // findOne(@Param('id', ParseIntPipe) id: number) {
   //   return this.ridesService.findOne(id);
   // }
+  @Get('search')
+  async search(@Query() filters: RideFiltersDto) {
+    return this.ridesService.searchRides(filters);
+  }
 }

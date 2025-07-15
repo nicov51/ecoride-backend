@@ -4,9 +4,10 @@ import { Ride } from '../../models/ride.entity';
 import { User } from '../../models/user.entity';
 import { Car } from '../../models/car.entity';
 import { CarpoolZone } from '../../models/carpool-zone.entity';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RideResponseDto } from '../../dto/ride-response.dto';
+import { RideFiltersDto } from '../../dto/ride-filters.dto';
 
 @Injectable()
 export class RidesService {
@@ -20,6 +21,7 @@ export class RidesService {
     @InjectRepository(CarpoolZone)
     private carpoolZoneRepo: Repository<CarpoolZone>,
   ) {}
+
   async create(dto: CreateRideDto): Promise<RideResponseDto> {
     const driver = await this.userRepo.findOneBy({ id: dto.driverId });
     if (!driver) throw new NotFoundException('Chauffeur non trouvé');
@@ -61,6 +63,7 @@ export class RidesService {
     }
     return new RideResponseDto(rideWithRelations);
   }
+
   async findAll(): Promise<RideResponseDto[]> {
     const rides = await this.rideRepo.find({
       relations: [
@@ -73,5 +76,41 @@ export class RidesService {
       ],
     });
     return rides.map((r) => new RideResponseDto(r));
+  }
+
+  async searchRides(filters: RideFiltersDto): Promise<RideResponseDto[]> {
+    const query = this.buildSearchQuery(filters);
+    const rides = await query.getMany();
+    return rides.map((r) => new RideResponseDto(r));
+  }
+
+  private buildSearchQuery(filters: RideFiltersDto) {
+    const query = this.rideRepo
+      .createQueryBuilder('ride')
+      .leftJoinAndSelect('ride.driver', 'driver')
+      .leftJoinAndSelect('ride.car', 'car');
+    // Filtres de base
+    if (filters.from) {
+      query.andWhere('ride.departurePlace LIKE :from', {
+        from: `%${filters.from}%`,
+      });
+    }
+    // Ajoutez d'autres filtres de la même manière
+    this.applyAdvancedFilters(query, filters);
+
+    return query;
+  }
+
+  private applyAdvancedFilters(
+    query: SelectQueryBuilder<Ride>,
+    filters: RideFiltersDto,
+  ) {
+    // Exemple de filtre avancé
+    if (filters.minPrice) {
+      query.andWhere('ride.price >= :minPrice', { minPrice: filters.minPrice });
+    }
+
+    // Trie par défaut
+    query.addOrderBy('ride.departureDate', 'ASC');
   }
 }
