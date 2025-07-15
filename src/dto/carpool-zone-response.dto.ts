@@ -1,18 +1,17 @@
-import { Expose } from 'class-transformer';
+import { CarpoolZone } from '../models/carpool-zone.entity';
 
 export class CarpoolZoneResponseDto {
-  @Expose()
   id: number;
-
-  @Expose()
   label: string;
-
-  @Expose()
   lat: number;
-
-  @Expose()
   lng: number;
-
-  @Expose()
   type: string;
+
+  constructor(zone: CarpoolZone) {
+    this.id = zone.id;
+    this.label = zone.label;
+    this.lat = zone.lat;
+    this.lng = zone.lng;
+    this.type = zone.type;
+  }
 }
