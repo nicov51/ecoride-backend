@@ -1,7 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-export type CarpoolZoneType = 'departure' | 'arrival';
-
 @Entity()
 export class CarpoolZone {
   @PrimaryGeneratedColumn()
@@ -15,7 +13,4 @@ export class CarpoolZone {
 
   @Column('float')
   lng: number;
-
-  @Column({ type: 'enum', enum: ['departure', 'arrival'] })
-  type: CarpoolZoneType;
 }

@@ -1,4 +1,4 @@
-import { IsLatitude, IsLongitude, IsEnum, IsString } from 'class-validator';
+import { IsLatitude, IsLongitude, IsString } from 'class-validator';
 
 export class CreateCarpoolZoneDto {
   @IsString()
@@ -9,7 +9,4 @@ export class CreateCarpoolZoneDto {
 
   @IsLongitude()
   lng: number;
-
-  @IsEnum(['departure', 'arrival'])
-  type: 'departure' | 'arrival';
 }
