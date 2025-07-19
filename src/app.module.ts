@@ -13,6 +13,9 @@ import { BrandModule } from './modules/brand/brand.module';
 import { RidesModule } from './modules/rides/rides.module';
 import { CarpoolZonesModule } from './modules/carpool-zones/carpool-zones.module';
 import { ParticipationsModule } from './modules/participations/participations.module';
+import { GeocodingModule } from './modules/geocoding/geocoding.module';
+import { ItineraryService } from './modules/itinerary/itinerary.service';
+import { ItineraryModule } from './modules/itinerary/itinerary.module';
 
 @Module({
   imports: [
@@ -40,8 +43,10 @@ import { ParticipationsModule } from './modules/participations/participations.mo
     RidesModule,
     CarpoolZonesModule,
     ParticipationsModule,
+    GeocodingModule,
+    ItineraryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ItineraryService],
 })
 export class AppModule {}
