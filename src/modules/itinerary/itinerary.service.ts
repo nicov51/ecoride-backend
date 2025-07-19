@@ -33,11 +33,10 @@ export class ItineraryService {
    * @returns Données GeoJSON de l'itinéraire
    */
   async getItinerary(body: ItineraryRequest): Promise<ORSResponse> {
-    const apiKey = process.env.OPENROUTESERVICE_API_KEY;
     const url = 'https://api.openrouteservice.org/v2/directions/driving-car';
 
     const headers = {
-      Authorization: apiKey ?? '',
+      Authorization: process.env.OPENROUTESERVICE_API_KEY,
       'Content-Type': 'application/json',
     };
 
@@ -45,11 +44,12 @@ export class ItineraryService {
       coordinates: [body.start, body.end],
       instructions: false,
     };
+    console.log('Payload ORS :', JSON.stringify(payload));
 
     const response = await lastValueFrom(
       this.http.post<ORSResponse>(url, payload, { headers }),
     );
-
+    console.log('Réponse ORS :', JSON.stringify(response.data, null, 2));
     return response.data;
   }
 }

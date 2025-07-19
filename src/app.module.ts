@@ -47,6 +47,6 @@ import { ItineraryModule } from './modules/itinerary/itinerary.module';
     ItineraryModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ItineraryService],
+  providers: [AppService],
 })
 export class AppModule {}
