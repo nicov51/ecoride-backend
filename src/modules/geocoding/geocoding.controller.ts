@@ -1,5 +1,3 @@
-// src/geocoding/geocoding.controller.ts
-
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { GeocodingService, NominatimResult } from './geocoding.service';
 
@@ -13,7 +11,18 @@ export class GeocodingController {
         'paramètre requis avec au moins 3 caractères.',
       );
     }
+    // Nettoyage de la requête
+    const cleanedQuery = query.trim();
 
-    return this.geocodingService.geocode(query);
+    try {
+      // Appel au service avec la requête nettoyée
+      const results = await this.geocodingService.geocode(cleanedQuery);
+
+      // On s'assure qu'on retourne toujours un tableau (même vide)
+      return results || [];
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return [];
+    }
   }
 }
