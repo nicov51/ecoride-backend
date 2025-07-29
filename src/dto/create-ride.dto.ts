@@ -1,28 +1,24 @@
 import {
   IsDateString,
+  IsEnum,
   IsInt,
   IsNumber,
+  IsObject,
+  IsOptional,
   IsPositive,
   IsString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { RideStatus } from '../models/ride-status.enum';
 
 export class CreateRideDto {
-  @IsDateString()
-  @Type(() => Date)
-  departureDate: Date;
-
-  @IsDateString()
-  @Type(() => Date)
-  arrivalDate: Date;
-
   @IsDateString() // Format "HH:mm:ss" ou "HH:mm"
   @Type(() => Date)
-  departureTime: Date;
+  departureDateTime: Date;
 
   @IsDateString()
   @Type(() => Date)
-  arrivalTime: Date;
+  arrivalDateTime: Date;
 
   @IsString()
   departurePlace: string;
@@ -38,8 +34,8 @@ export class CreateRideDto {
   @IsPositive()
   price: number;
 
-  @IsString()
-  status: string;
+  @IsEnum(RideStatus)
+  status: RideStatus;
 
   @IsInt()
   driverId: number;
@@ -52,4 +48,22 @@ export class CreateRideDto {
 
   @IsInt()
   arrivalZoneId: number;
+
+  @IsOptional()
+  @IsObject()
+  options?: {
+    petsAllowed?: boolean;
+    luggageAllowed?: boolean;
+    airConditioning?: boolean;
+  };
+
+  @IsOptional()
+  @IsObject()
+  preferences?: {
+    chat: string;
+    smoking: string;
+    music: string;
+    pets: string;
+    other: string;
+  };
 }

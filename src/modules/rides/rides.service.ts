@@ -23,12 +23,15 @@ export class RidesService {
   ) {}
 
   async create(dto: CreateRideDto): Promise<RideResponseDto> {
+    // 1. On récupère le chauffeur depuis son ID
     const driver = await this.userRepo.findOneBy({ id: dto.driverId });
     if (!driver) throw new NotFoundException('Chauffeur non trouvé');
 
+    // 2. On récupère la voiture liée au trajet
     const car = await this.carRepo.findOneBy({ id: dto.carId });
     if (!car) throw new NotFoundException('Voiture non trouvée');
 
+    // 3. On récupère les zones de départ et d’arrivée
     const departureZone = await this.carpoolZoneRepo.findOneBy({
       id: dto.departureZoneId,
     });
@@ -39,6 +42,8 @@ export class RidesService {
       id: dto.arrivalZoneId,
     });
     if (!arrivalZone) throw new NotFoundException('Zone d’arrivée introuvable');
+
+    // 4. On crée le trajet
     const ride = this.rideRepo.create({
       ...dto,
       driver,
@@ -46,7 +51,11 @@ export class RidesService {
       departureZone,
       arrivalZone,
     });
+
+    // 5. On sauvegarde le trajet
     const savedRide = await this.rideRepo.save(ride);
+
+    // 6. On recharge avec toutes les relations pour le retour
     const rideWithRelations = await this.rideRepo.findOne({
       where: { id: savedRide.id },
       relations: [
@@ -58,9 +67,12 @@ export class RidesService {
         'reviews',
       ],
     });
+
     if (!rideWithRelations) {
       throw new NotFoundException('Trajet non trouvé après création');
     }
+
+    // 7. On renvoie un DTO propre
     return new RideResponseDto(rideWithRelations);
   }
 
@@ -76,6 +88,20 @@ export class RidesService {
       ],
     });
     return rides.map((r) => new RideResponseDto(r));
+  }
+
+  async findMyRides(userId: number): Promise<Ride[]> {
+    return this.rideRepo.find({
+      where: { driver: { id: userId } },
+      relations: [
+        'driver',
+        'car',
+        'departureZone',
+        'arrivalZone',
+        'participations',
+        'reviews',
+      ],
+    });
   }
 
   async searchRides(filters: RideFiltersDto): Promise<RideResponseDto[]> {
@@ -111,6 +137,6 @@ export class RidesService {
     }
 
     // Trie par défaut
-    query.addOrderBy('ride.departureDate', 'ASC');
+    query.addOrderBy('ride.departureDateTime', 'ASC');
   }
 }
