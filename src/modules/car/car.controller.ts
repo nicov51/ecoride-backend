@@ -19,6 +19,7 @@ export class CarController {
   create(@Body() createCarDto: CreateCarDto) {
     return this.carService.create(createCarDto);
   }
+  //Todo on remplacera @Query('userId') par @CurrentUser() avec les guards
   @Get()
   findByUser(@Query('userId') userId: string) {
     return this.carService.findAllByUser(+userId);

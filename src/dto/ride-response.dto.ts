@@ -3,10 +3,8 @@ import { CarpoolZoneResponseDto } from './carpool-zone-response.dto';
 
 export class RideResponseDto {
   id: number;
-  departureDate: Date;
-  arrivalDate: Date;
-  departureTime: Date;
-  arrivalTime: Date;
+  departureDateTime: Date;
+  arrivalDateTime: Date;
   departurePlace: string;
   arrivalPlace: string;
   seats: number;
@@ -20,10 +18,8 @@ export class RideResponseDto {
 
   constructor(ride: Ride) {
     this.id = ride.id;
-    this.departureDate = ride.departureDate;
-    this.arrivalDate = ride.arrivalDate;
-    this.departureTime = ride.departureTime;
-    this.arrivalTime = ride.arrivalTime;
+    this.departureDateTime = ride.departureDateTime;
+    this.arrivalDateTime = ride.arrivalDateTime;
     this.departurePlace = ride.departurePlace;
     this.arrivalPlace = ride.arrivalPlace;
     this.seats = ride.seats;

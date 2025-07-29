@@ -1,14 +1,8 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RidesService } from './rides.service';
-
+import { RideFiltersDto } from '../../dto/ride-filters.dto';
+import { RideResponseDto } from '../../dto/ride-response.dto';
 @Controller('rides')
 export class RidesController {
   constructor(private readonly ridesService: RidesService) {}
@@ -20,8 +14,16 @@ export class RidesController {
   findAll() {
     return this.ridesService.findAll();
   }
-  // @Get(':id')
-  // findOne(@Param('id', ParseIntPipe) id: number) {
-  //   return this.ridesService.findOne(id);
-  // }
+  // Todo activer les guards pour injecter req.user
+  @Get('by-user')
+  async findByUser(
+    @Query('userId') userId: string,
+  ): Promise<RideResponseDto[]> {
+    const rides = await this.ridesService.findMyRides(+userId);
+    return rides.map((ride) => new RideResponseDto(ride));
+  }
+  @Get('search')
+  async search(@Query() filters: RideFiltersDto) {
+    return this.ridesService.searchRides(filters);
+  }
 }
