@@ -51,15 +51,15 @@ export class CreateRideDto {
 
   @IsOptional()
   @IsObject()
-  options?: {
-    petsAllowed?: boolean;
-    luggageAllowed?: boolean;
-    airConditioning?: boolean;
+  options: {
+    petsAllowed: boolean;
+    luggageAllowed: boolean;
+    airConditioning: boolean;
   };
 
   @IsOptional()
   @IsObject()
-  preferences?: {
+  preferences: {
     chat: string;
     smoking: string;
     music: string;

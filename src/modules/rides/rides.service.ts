@@ -50,6 +50,18 @@ export class RidesService {
       car,
       departureZone,
       arrivalZone,
+      options: dto.options || {
+        petsAllowed: false,
+        luggageAllowed: false,
+        airConditioning: false,
+      },
+      preferences: dto.preferences || {
+        chat: 'neutre',
+        smoking: 'non',
+        music: 'modérée',
+        pets: 'non',
+        other: '',
+      },
     });
 
     // 5. On sauvegarde le trajet

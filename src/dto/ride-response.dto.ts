@@ -1,7 +1,10 @@
 import { Ride } from '../models/ride.entity';
 import { CarpoolZoneResponseDto } from './carpool-zone-response.dto';
+import { CarResponseDto } from './car-response.dto';
+import { ParticipationResponseDto } from './participation-response.dto';
 
 export class RideResponseDto {
+  participations: ParticipationResponseDto[];
   id: number;
   departureDateTime: Date;
   arrivalDateTime: Date;
@@ -11,11 +14,31 @@ export class RideResponseDto {
   price: number;
   status: string;
   participationCount: number;
-  driverId: number;
-  carId: number;
+  driver: {
+    id: number;
+    name: string;
+    picture?: string;
+  };
+  car?: CarResponseDto;
   departureZone: CarpoolZoneResponseDto;
   arrivalZone: CarpoolZoneResponseDto;
+  options:
+    | {
+        petsAllowed?: boolean;
+        luggageAllowed?: boolean;
+        airConditioning?: boolean;
+      }
+    | undefined;
 
+  preferences:
+    | {
+        chat: string;
+        smoking: string;
+        music: string;
+        pets: string;
+        other: string;
+      }
+    | undefined;
   constructor(ride: Ride) {
     this.id = ride.id;
     this.departureDateTime = ride.departureDateTime;
@@ -25,10 +48,28 @@ export class RideResponseDto {
     this.seats = ride.seats;
     this.price = ride.price;
     this.status = ride.status;
-    this.driverId = ride.driver?.id;
-    this.carId = ride.car?.id;
+    this.driver = {
+      id: ride.driver.id,
+      name: ride.driver.name,
+      picture: ride.driver.picture
+        ? this.bufferToBase64(ride.driver.picture)
+        : undefined,
+    };
+    this.car = ride.car ? new CarResponseDto(ride.car) : undefined;
     this.departureZone = new CarpoolZoneResponseDto(ride.departureZone);
     this.arrivalZone = new CarpoolZoneResponseDto(ride.arrivalZone);
     this.participationCount = ride.participations?.length ?? 0;
+    this.options = ride.options;
+    this.preferences = ride.preferences;
+
+    if (ride.participations) {
+      this.participations = ride.participations.map(
+        (p) => new ParticipationResponseDto(p),
+      );
+    }
+  }
+  //on doit convertir le buffer en string
+  private bufferToBase64(buffer: Buffer): string {
+    return `data:image/jpeg;base64,${buffer.toString('base64')}`;
   }
 }
