@@ -15,6 +15,7 @@ import { Car } from './car.entity';
 import { Participation } from './participation.entity';
 import { Review } from './review.entity';
 import { SearchHistory } from './search-history.entity';
+import { RidePreferences } from './ride-preferences';
 
 @Entity()
 export class User {
@@ -50,6 +51,9 @@ export class User {
 
   @Column({ default: false })
   isVerified: boolean;
+
+  @Column({ type: 'json', nullable: true })
+  preferences?: RidePreferences;
 
   @ManyToMany(() => Role, (role) => role.users)
   @JoinTable()

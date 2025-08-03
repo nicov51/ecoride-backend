@@ -8,6 +8,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RideResponseDto } from '../../dto/ride-response.dto';
 import { RideFiltersDto } from '../../dto/ride-filters.dto';
+import { RidePreferences } from '../../models/ride-preferences';
 
 @Injectable()
 export class RidesService {
@@ -151,4 +152,15 @@ export class RidesService {
     // Trie par défaut
     query.addOrderBy('ride.departureDateTime', 'ASC');
   }
+
+  // async getLastRidePreferences(
+  //   userId: number,
+  // ): Promise<RidePreferences | undefined> {
+  //   const lastRide = await this.rideRepo.findOne({
+  //     where: { driver: { id: userId } },
+  //     order: { id: 'DESC' },
+  //     select: ['preferences'],
+  //   });
+  //   return lastRide?.preferences;
+  // }
 }
