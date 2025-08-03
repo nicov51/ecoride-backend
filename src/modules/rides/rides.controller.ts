@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
 import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RidesService } from './rides.service';
 import { RideFiltersDto } from '../../dto/ride-filters.dto';
@@ -26,4 +26,8 @@ export class RidesController {
   async search(@Query() filters: RideFiltersDto) {
     return this.ridesService.searchRides(filters);
   }
+  // @Get('last-preferences')
+  // async getLastPreferences(@Req() req: Request) {
+  //   return this.ridesService.getLastRidePreferences(req.user.id);
+  // }
 }
