@@ -54,4 +54,14 @@ export class RolesService {
   async assignAdminRole(userId: number): Promise<void> {
     return this.addRoleToUser(userId, 'Admin');
   }
+  async getUserRoles(userId: number): Promise<Role[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['roles'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return user.roles;
+  }
 }
