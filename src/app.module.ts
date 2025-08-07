@@ -14,8 +14,9 @@ import { RidesModule } from './modules/rides/rides.module';
 import { CarpoolZonesModule } from './modules/carpool-zones/carpool-zones.module';
 import { ParticipationsModule } from './modules/participations/participations.module';
 import { GeocodingModule } from './modules/geocoding/geocoding.module';
-import { ItineraryService } from './modules/itinerary/itinerary.service';
 import { ItineraryModule } from './modules/itinerary/itinerary.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { EmployeeModule } from './modules/employee/employee.module';
 
 @Module({
   imports: [
@@ -45,6 +46,8 @@ import { ItineraryModule } from './modules/itinerary/itinerary.module';
     ParticipationsModule,
     GeocodingModule,
     ItineraryModule,
+    AdminModule,
+    EmployeeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

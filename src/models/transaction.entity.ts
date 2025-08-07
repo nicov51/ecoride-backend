@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Wallet } from './wallet.entity';
+import { Platform } from './platform.entity';
 
 @Entity()
 export class Transaction {
@@ -8,6 +9,9 @@ export class Transaction {
 
   @ManyToOne(() => Wallet, (wallet) => wallet.transactions)
   wallet: Wallet;
+
+  @ManyToOne(() => Platform, (platform) => platform.transactions)
+  platform: Platform;
 
   @Column('float')
   amount: number;

@@ -50,6 +50,7 @@ export class RolesService {
   async assignDriverRole(userId: number): Promise<void> {
     return this.addRoleToUser(userId, 'Driver');
   }
+  // todo  l'admin doit pas etre cree dans l'appli
   async assignAdminRole(userId: number): Promise<void> {
     return this.addRoleToUser(userId, 'Admin');
   }

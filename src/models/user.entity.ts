@@ -52,6 +52,15 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
+  @Column({ default: false })
+  isSuspended: boolean;
+
+  @Column({ type: 'datetime', nullable: true })
+  suspendedAt: Date | null;
+
+  @Column()
+  employeeNumber?: string;
+
   @Column({ type: 'json', nullable: true })
   preferences?: RidePreferences;
 

@@ -2,6 +2,12 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 import { Ride } from './ride.entity';
 
+export enum ReviewStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
 @Entity()
 export class Review {
   @PrimaryGeneratedColumn()
@@ -13,7 +19,11 @@ export class Review {
   @Column()
   rating: number;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: ReviewStatus,
+    default: ReviewStatus.PENDING,
+  })
   status: string;
 
   @ManyToOne(() => User, (user) => user.reviews)
