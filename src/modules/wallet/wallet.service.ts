@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Wallet } from '../models/wallet.entity';
+import { Wallet } from '../../models/wallet.entity';
 import { Repository } from 'typeorm';
-import { User } from '../models/user.entity';
+import { User } from '../../models/user.entity';
 
 @Injectable()
 export class WalletService {
