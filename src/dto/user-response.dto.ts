@@ -1,4 +1,5 @@
 import { User } from '../models/user.entity';
+import { RoleDto } from './role.dto';
 
 export class UserResponseDto {
   id: number;
@@ -11,6 +12,9 @@ export class UserResponseDto {
   pseudo: string;
   isVerified: boolean;
   picture: string | null;
+  isSuspended: boolean;
+  suspendedAt?: string | null;
+  roles: RoleDto[];
 
   constructor(user: User) {
     this.id = user.id;
@@ -22,6 +26,9 @@ export class UserResponseDto {
     this.birthDate = String(user.birthDate); // plus simple
     this.pseudo = user.pseudo;
     this.isVerified = user.isVerified;
+    this.isSuspended = user.isSuspended;
+    this.suspendedAt = user.suspendedAt?.toISOString();
+    this.roles = user.roles?.map((role) => new RoleDto(role));
 
     // Simplification sans instanceof
     if (user.picture) {

@@ -58,7 +58,7 @@ export class User {
   @Column({ type: 'datetime', nullable: true })
   suspendedAt: Date | null;
 
-  @Column()
+  @Column({ nullable: true })
   employeeNumber?: string;
 
   @Column({ type: 'json', nullable: true })

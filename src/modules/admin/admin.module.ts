@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { Ride } from '../../models/ride.entity';
@@ -9,11 +9,14 @@ import { UsersService } from '../users/users.service';
 import { Role } from '../../models/role.entity';
 import { User } from '../../models/user.entity';
 import { Wallet } from '../../models/wallet.entity';
-import { JwtService } from '@nestjs/jwt';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Ride, Platform, Role, User, Wallet])],
+  imports: [
+    TypeOrmModule.forFeature([Ride, Platform, Role, User, Wallet]),
+    forwardRef(() => AuthModule),
+  ],
   controllers: [AdminController],
-  providers: [AdminService, RolesService, UsersService, JwtService],
+  providers: [AdminService, RolesService, UsersService],
 })
 export class AdminModule {}

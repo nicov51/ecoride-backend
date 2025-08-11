@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from '../../dto/login.dto';
 import { RegisterDto } from '../../dto/register.dto';
+import { UserResponseDto } from '../../dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,10 +44,15 @@ export class AuthService {
       throw new UnauthorizedException('Mot de passe incorrect');
     }
 
-    // 5. Génération du token
-    const payload = { id: user.id, email: normalizedEmail };
+    // 5. Génération du token avec les roles
+    const payload = {
+      id: user.id,
+      email: normalizedEmail,
+      roles: user.roles,
+    };
     return {
       access_token: this.jwtService.sign(payload),
+      user: new UserResponseDto(user),
     };
   }
   async register(registerDto: RegisterDto) {

@@ -7,6 +7,7 @@ import { CreateEmployeeDto } from '../../dto/create-employee.dto';
 import { UsersService } from '../users/users.service';
 import { Platform } from '../../models/platform.entity';
 import { User } from '../../models/user.entity';
+import { Wallet } from '../../models/wallet.entity';
 
 @Injectable()
 export class AdminService {
@@ -14,6 +15,8 @@ export class AdminService {
     @InjectRepository(Ride) private readonly rideRepository: Repository<Ride>,
     @InjectRepository(Platform)
     private readonly platformRepository: Repository<Platform>,
+    @InjectRepository(Wallet)
+    private readonly walletRepository: Repository<Wallet>,
     private rolesService: RolesService,
     private usersService: UsersService,
   ) {}
@@ -30,7 +33,7 @@ export class AdminService {
     // Retourne les données pour le graphique
     return this.rideRepository
       .createQueryBuilder('ride')
-      .select('DATE(ride.departureTime)', 'date')
+      .select('DATE(ride.departureDateTime)', 'date')
       .addSelect('COUNT(*)', 'count')
       .groupBy('date')
       .getRawMany();
@@ -41,17 +44,37 @@ export class AdminService {
       .createQueryBuilder('platform')
       .leftJoinAndSelect('platform.wallet', 'wallet')
       .leftJoinAndSelect('wallet.transactions', 'transactions')
-      .select('DATE(transactions.createdAt)', 'date')
+      .select('DATE(transactions.date)', 'date')
       .addSelect('SUM(transactions.amount)', 'total')
       .groupBy('date')
       .getRawMany();
   }
 
   async getTotalCredits(): Promise<number> {
+    // D'abord essayer de trouver la plateforme existante
     const platform = await this.platformRepository.findOne({
       relations: ['wallet'],
+      where: { name: 'EcoRide' }, // Ajout d'un critère spécifique
     });
-    return platform?.wallet.balance || 0;
+
+    if (platform) {
+      return platform.wallet?.balance || 0;
+    }
+
+    // Création seulement si elle n'existe pas
+    const newWallet = this.walletRepository.create({
+      balance: 0,
+      createdAt: new Date(),
+    });
+    await this.walletRepository.save(newWallet);
+
+    const newPlatform = this.platformRepository.create({
+      name: 'EcoRide',
+      wallet: newWallet,
+    });
+    await this.platformRepository.save(newPlatform);
+
+    return 0;
   }
 
   async suspendUser(userId: number): Promise<User> {
