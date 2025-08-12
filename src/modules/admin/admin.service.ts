@@ -29,6 +29,8 @@ export class AdminService {
     return employee;
   }
 
+  async getEmployees() {}
+
   async getRideStatistics() {
     // Retourne les données pour le graphique
     return this.rideRepository

@@ -11,6 +11,10 @@ export class AdminController {
   createEmployee(@Body() dto: CreateEmployeeDto) {
     return this.adminService.createEmployee(dto);
   }
+  @Get('employees')
+  getEmployees() {
+    return this.adminService.getEmployees();
+  }
   @Get('stats/rides')
   getRideStats() {
     return this.adminService.getRideStatistics();
