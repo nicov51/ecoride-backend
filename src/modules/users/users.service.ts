@@ -48,6 +48,12 @@ export class UsersService {
       order: { id: 'ASC' },
     });
   }
+  async findEmployees(): Promise<User[]> {
+    return this.userRepository.find({
+      where: { roles: { label: 'Employee' } },
+      relations: ['roles'],
+    });
+  }
   async findByEmail(email: string): Promise<User | null> {
     console.log(`Recherche user par email: ${email}`); // Debug
     const user = await this.userRepository.findOne({
