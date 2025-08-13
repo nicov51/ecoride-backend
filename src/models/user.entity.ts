@@ -40,7 +40,13 @@ export class User {
   @Column()
   address: string;
 
-  @Column({ type: 'date' })
+  @Column({
+    type: 'date',
+    transformer: {
+      from: (value: string) => new Date(value), // Conversion lecture
+      to: (value: Date) => value.toISOString().split('T')[0], // Conversion écriture
+    },
+  })
   birthDate: Date;
 
   @Column({ type: 'blob', nullable: true })

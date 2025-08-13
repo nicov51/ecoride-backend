@@ -21,10 +21,12 @@ export class AdminService {
     private usersService: UsersService,
   ) {}
   async createEmployee(dto: CreateEmployeeDto) {
-    const employee = await this.usersService.create({
+    const employeeData = {
       ...dto,
+      birthDate: new Date(dto.birthDate),
       isVerified: true,
-    });
+    };
+    const employee = await this.usersService.create(employeeData);
     await this.rolesService.addRoleToUser(employee.id, 'Employee');
     return employee;
   }

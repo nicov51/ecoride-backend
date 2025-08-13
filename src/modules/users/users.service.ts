@@ -24,6 +24,7 @@ export class UsersService {
       ...data,
       password: data.password,
       picture: undefined,
+      birthDate: new Date(data.birthDate),
     });
     await this.userRepository.save(user);
     // Assigner le rôle Passenger
