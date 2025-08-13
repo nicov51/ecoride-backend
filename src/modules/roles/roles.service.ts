@@ -50,7 +50,18 @@ export class RolesService {
   async assignDriverRole(userId: number): Promise<void> {
     return this.addRoleToUser(userId, 'Driver');
   }
+  // todo  l'admin doit pas etre cree dans l'appli
   async assignAdminRole(userId: number): Promise<void> {
     return this.addRoleToUser(userId, 'Admin');
+  }
+  async getUserRoles(userId: number): Promise<Role[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['roles'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    return user.roles;
   }
 }

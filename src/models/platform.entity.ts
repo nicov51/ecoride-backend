@@ -4,8 +4,10 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Wallet } from './wallet.entity';
+import { Transaction } from './transaction.entity';
 
 @Entity()
 export class Platform {
@@ -15,7 +17,10 @@ export class Platform {
   @Column()
   name: string;
 
-  @OneToOne(() => Wallet)
+  @OneToOne(() => Wallet, (wallet) => wallet.platform)
   @JoinColumn()
   wallet: Wallet;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.platform)
+  transactions: Transaction[];
 }

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Transaction } from './transaction.entity';
 import { User } from './user.entity';
+import { Platform } from './platform.entity';
 
 @Entity()
 export class Wallet {
@@ -26,4 +27,7 @@ export class Wallet {
 
   @OneToMany(() => Transaction, (tx) => tx.wallet)
   transactions: Transaction[];
+
+  @OneToOne(() => Platform, (platform) => platform.wallet)
+  platform: Platform;
 }

@@ -13,6 +13,7 @@ import { UserResponseDto } from '../../dto/user-response.dto';
 import { RegisterDto } from '../../dto/register.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RequestWithUser } from '../../dto/request-with-user.dto';
+import { RolesGuard } from '../roles/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -25,11 +26,18 @@ export class UsersController {
     const user = await this.usersService.findByEmail(email);
     return user ? new UserResponseDto(user) : null;
   }
-
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async getAllUsers(): Promise<UserResponseDto[]> {
+    const users = await this.usersService.findAll();
+    return users.map((user) => new UserResponseDto(user));
+  }
   @Get('current')
   @UseGuards(JwtAuthGuard)
   async getCurrentUser(@Req() req: RequestWithUser) {
-    const user = await this.usersService.findById(req.user.id);
+    const user = await this.usersService.findById(req.user.id, {
+      relations: ['roles'], // FORCER le chargement des relations?
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }

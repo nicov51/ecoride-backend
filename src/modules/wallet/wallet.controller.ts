@@ -7,10 +7,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { WalletService } from './wallet.service';
-import { WalletDto } from '../dto/wallet.dto';
-import { UsersService } from '../modules/users/users.service';
-import { RequestWithUser } from '../dto/request-with-user.dto';
-import { JwtAuthGuard } from '../modules/auth/jwt-auth.guard';
+import { UsersService } from '../users/users.service';
+import { RequestWithUser } from '../../dto/request-with-user.dto';
+import { WalletDto } from '../../dto/wallet.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('wallet')
 export class WalletController {

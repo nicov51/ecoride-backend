@@ -40,7 +40,13 @@ export class User {
   @Column()
   address: string;
 
-  @Column({ type: 'date' })
+  @Column({
+    type: 'date',
+    transformer: {
+      from: (value: string) => new Date(value), // Conversion lecture
+      to: (value: Date) => value.toISOString().split('T')[0], // Conversion écriture
+    },
+  })
   birthDate: Date;
 
   @Column({ type: 'blob', nullable: true })
@@ -51,6 +57,15 @@ export class User {
 
   @Column({ default: false })
   isVerified: boolean;
+
+  @Column({ default: false })
+  isSuspended: boolean;
+
+  @Column({ type: 'datetime', nullable: true })
+  suspendedAt: Date | null;
+
+  @Column({ nullable: true })
+  employeeNumber?: string;
 
   @Column({ type: 'json', nullable: true })
   preferences?: RidePreferences;
