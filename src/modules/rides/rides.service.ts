@@ -8,7 +8,6 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RideResponseDto } from '../../dto/ride-response.dto';
 import { RideFiltersDto } from '../../dto/ride-filters.dto';
-import { RidePreferences } from '../../models/ride-preferences';
 
 @Injectable()
 export class RidesService {

@@ -26,6 +26,15 @@ export class Review {
   })
   status: string;
 
+  @Column({ default: false })
+  isProblem: boolean;
+
+  @Column({ nullable: true })
+  reason?: string;
+
+  @Column({ type: 'datetime' })
+  createdAt: Date;
+
   @ManyToOne(() => User, (user) => user.reviews)
   user: User;
 
