@@ -19,7 +19,7 @@ export class RideResponseDto {
     name: string;
     picture?: string;
   };
-  car?: CarResponseDto;
+  car: CarResponseDto;
   departureZone: CarpoolZoneResponseDto;
   arrivalZone: CarpoolZoneResponseDto;
   options:
@@ -55,7 +55,7 @@ export class RideResponseDto {
         ? this.bufferToBase64(ride.driver.picture)
         : undefined,
     };
-    this.car = ride.car ? new CarResponseDto(ride.car) : undefined;
+    this.car = new CarResponseDto(ride.car);
     this.departureZone = new CarpoolZoneResponseDto(ride.departureZone);
     this.arrivalZone = new CarpoolZoneResponseDto(ride.arrivalZone);
     this.participationCount = ride.participations?.length ?? 0;

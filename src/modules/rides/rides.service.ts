@@ -126,16 +126,37 @@ export class RidesService {
     const query = this.rideRepo
       .createQueryBuilder('ride')
       .leftJoinAndSelect('ride.driver', 'driver')
-      .leftJoinAndSelect('ride.car', 'car');
+      .leftJoinAndSelect('ride.car', 'car')
+      .leftJoinAndSelect('ride.departureZone', 'departureZone')
+      .leftJoinAndSelect('ride.arrivalZone', 'arrivalZone')
+      .leftJoinAndSelect('ride.participations', 'participations')
+      .where('ride.seats > 0');
+
     // Filtres de base
     if (filters.from) {
-      query.andWhere('ride.departurePlace LIKE :from', {
-        from: `%${filters.from}%`,
+      query.andWhere('LOWER(ride.departurePlace) LIKE LOWER(:from)', {
+        from: `%${filters.from.toLowerCase()}%`,
       });
     }
-    // Ajoutez d'autres filtres de la même manière
-    this.applyAdvancedFilters(query, filters);
+    if (filters.to) {
+      query.andWhere('LOWER(ride.arrivalPlace) LIKE LOWER(:to)', {
+        to: `%${filters.to.toLowerCase()}%`,
+      });
+    }
+    if (filters.date) {
+      // Recherche sur +- 3 jours autour de la date demandée
+      const startDate = new Date(filters.date);
+      startDate.setDate(startDate.getDate() - 3);
 
+      const endDate = new Date(filters.date);
+      endDate.setDate(endDate.getDate() + 3);
+
+      query.andWhere('ride.departureDateTime BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      });
+    }
+    this.applyAdvancedFilters(query, filters);
     return query;
   }
 
@@ -148,7 +169,51 @@ export class RidesService {
       query.andWhere('ride.price >= :minPrice', { minPrice: filters.minPrice });
     }
 
-    // Trie par défaut
+    if (filters.maxPrice) {
+      query.andWhere('ride.price <= :maxPrice', { maxPrice: filters.maxPrice });
+    }
+
+    if (filters.maxDuration) {
+      query.andWhere(
+        'TIMESTAMPDIFF(MINUTE, ride.departureDateTime, ride.arrivalDateTime) <= :maxDuration',
+        {
+          maxDuration: filters.maxDuration,
+        },
+      );
+    }
+
+    if (filters.seats) {
+      query.andWhere('ride.seats >= :seats', {
+        seats: filters.seats,
+      });
+    }
+
+    if (filters.electricOnly) {
+      query.andWhere('car.fuel = :fuel', {
+        fuel: 'ELECTRIC',
+      });
+    }
+
+    if (filters.departureZoneId) {
+      query.andWhere('ride.departureZoneId = :departureZoneId', {
+        departureZoneId: filters.departureZoneId,
+      });
+    }
+
+    if (filters.arrivalZoneId) {
+      query.andWhere('ride.arrivalZoneId = :arrivalZoneId', {
+        arrivalZoneId: filters.arrivalZoneId,
+      });
+    }
+
+    // Ajouter 'rating' à ton User.
+    // if (filters.minDriverRating) {
+    //   query.andWhere('driver.rating >= :minDriverRating', {
+    //     minDriverRating: filters.minDriverRating,
+    //   });
+    // }
+
+    // Tri par défaut
     query.addOrderBy('ride.departureDateTime', 'ASC');
   }
 
