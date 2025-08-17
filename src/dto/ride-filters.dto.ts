@@ -1,4 +1,11 @@
-import { IsOptional, IsNumber, Min, IsString } from 'class-validator';
+import {
+  IsOptional,
+  IsNumber,
+  Min,
+  Max,
+  IsString,
+  IsBoolean,
+} from 'class-validator';
 
 export class RideFiltersDto {
   @IsOptional()
@@ -21,4 +28,32 @@ export class RideFiltersDto {
   @IsNumber()
   @Min(1)
   seats?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  electricOnly?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  departureZoneId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  arrivalZoneId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxPrice?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxDuration?: number; // en minutes
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(5)
+  minDriverRating?: number;
 }

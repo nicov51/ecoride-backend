@@ -17,6 +17,7 @@ import { GeocodingModule } from './modules/geocoding/geocoding.module';
 import { ItineraryModule } from './modules/itinerary/itinerary.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { EmployeeModule } from './modules/employee/employee.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { EmployeeModule } from './modules/employee/employee.module';
     ItineraryModule,
     AdminModule,
     EmployeeModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

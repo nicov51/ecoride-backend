@@ -42,6 +42,9 @@ export class Ride {
   })
   status: string;
 
+  @Column({ default: false })
+  isReported: boolean;
+
   @Column({ type: 'json', nullable: true })
   options?: {
     petsAllowed?: boolean;
