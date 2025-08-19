@@ -119,7 +119,7 @@ export class RidesService {
   async searchRides(filters: RideFiltersDto): Promise<RideResponseDto[]> {
     const query = this.buildSearchQuery(filters);
     const rides = await query.getMany();
-    return rides.map((r) => new RideResponseDto(r));
+    return rides.map((ride) => new RideResponseDto(ride));
   }
 
   private buildSearchQuery(filters: RideFiltersDto) {
@@ -130,6 +130,7 @@ export class RidesService {
       .leftJoinAndSelect('ride.departureZone', 'departureZone')
       .leftJoinAndSelect('ride.arrivalZone', 'arrivalZone')
       .leftJoinAndSelect('ride.participations', 'participations')
+      .leftJoinAndSelect('participations.user', 'participationUser')
       .where('ride.seats > 0');
 
     // Filtres de base

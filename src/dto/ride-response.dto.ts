@@ -4,7 +4,7 @@ import { CarResponseDto } from './car-response.dto';
 import { ParticipationResponseDto } from './participation-response.dto';
 
 export class RideResponseDto {
-  participations: ParticipationResponseDto[];
+  participations?: ParticipationResponseDto[];
   id: number;
   departureDateTime: Date;
   arrivalDateTime: Date;
@@ -64,7 +64,7 @@ export class RideResponseDto {
 
     if (ride.participations) {
       this.participations = ride.participations.map(
-        (p) => new ParticipationResponseDto(p),
+        (p) => new ParticipationResponseDto(p, ride.id),
       );
     }
   }
