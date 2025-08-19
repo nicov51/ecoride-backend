@@ -18,6 +18,7 @@ import { ItineraryModule } from './modules/itinerary/itinerary.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { EmployeeModule } from './modules/employee/employee.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { TransactionModule } from './modules/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     AdminModule,
     EmployeeModule,
     ReviewsModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
