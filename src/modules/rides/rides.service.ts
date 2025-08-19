@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ride } from '../../models/ride.entity';
 import { User } from '../../models/user.entity';
@@ -228,4 +232,41 @@ export class RidesService {
   //   });
   //   return lastRide?.preferences;
   // }
+  async startRide(rideId: number, driverId: number): Promise<void> {
+    const ride = await this.rideRepo.findOne({
+      where: { id: rideId, driver: { id: driverId } },
+    });
+
+    if (!ride) throw new NotFoundException('Trajet non trouvé');
+    if (ride.status !== 'confirmed')
+      throw new ConflictException('Trajet ne peut pas être démarré');
+
+    ride.status = 'in_progress';
+    ride.startedAt = new Date();
+    await this.rideRepo.save(ride);
+  }
+
+  async completeRide(rideId: number, driverId: number): Promise<void> {
+    const ride = await this.rideRepo.findOne({
+      where: { id: rideId, driver: { id: driverId } },
+      relations: ['participations', 'participations.user'],
+    });
+
+    if (!ride) throw new NotFoundException('Trajet non trouvé');
+    if (ride.status !== 'in_progress')
+      throw new ConflictException('Trajet non démarré');
+
+    ride.status = 'completed';
+    ride.completedAt = new Date();
+    await this.rideRepo.save(ride);
+
+    // 📧 Envoyer emails aux participants pour validation
+    this.sendValidationEmails(ride);
+  }
+
+  private sendValidationEmails(ride: Ride): void {
+    // TODO: Implémenter l'envoi d'emails
+    // Pour chaque participant, envoyer un email avec lien vers validation
+    console.log(ride);
+  }
 }

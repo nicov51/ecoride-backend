@@ -42,6 +42,12 @@ export class Ride {
   })
   status: string;
 
+  @Column({ type: 'datetime', nullable: true })
+  startedAt: Date | null;
+
+  @Column({ type: 'datetime', nullable: true })
+  completedAt: Date | null;
+
   @Column({ default: false })
   isReported: boolean;
 
