@@ -11,5 +11,6 @@ import { AuthModule } from '../auth/auth.module';
   imports: [TypeOrmModule.forFeature([Review, User, Ride]), AuthModule],
   providers: [ReviewsService],
   controllers: [ReviewsController],
+  exports: [ReviewsService],
 })
 export class ReviewsModule {}

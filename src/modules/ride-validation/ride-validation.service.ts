@@ -7,7 +7,6 @@ import { Ride } from '../../models/ride.entity';
 import { User } from '../../models/user.entity';
 import { Platform } from '../../models/platform.entity';
 import { ReviewsService } from '../reviews/reviews.service';
-import { EmailService } from '../email/email.service';
 import { Transaction } from '../../models/transaction.entity';
 
 @Injectable()
@@ -18,13 +17,9 @@ export class RideValidationService {
     @InjectRepository(Ride)
     private rideRepo: Repository<Ride>,
     @InjectRepository(User)
-    private userRepo: Repository<User>,
     @InjectRepository(Platform)
-    private platformRepo: Repository<Platform>,
-    @InjectRepository(Transaction)
     private transactionRepo: Repository<Transaction>,
     private reviewsService: ReviewsService,
-    private emailService: EmailService,
     private dataSource: DataSource,
   ) {}
   async validateRideByParticipant(

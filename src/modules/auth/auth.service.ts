@@ -61,6 +61,19 @@ export class AuthService {
       ...registerDto,
       password: hashedPassword,
     });
+    // Todo: Générer token de confirmation
+    // const confirmationToken = jwt.sign(
+    //   { userId: newUser.id, email: newUser.email },
+    //   process.env.JWT_SECRET,
+    //   { expiresIn: '24h' },
+    // );
+    //
+    // Envoyer email de confirmation
+    // await this.emailService.sendRegistrationConfirmation(
+    //   { email: newUser.email, pseudo: newUser.pseudo },
+    //   confirmationToken,
+    // );
+    // return { message: 'Inscription réussie ! Vérifiez votre email pour confirmer votre compte.' };
   }
   // Méthode temporaire pour le AuthService
   async debugHashCompare() {

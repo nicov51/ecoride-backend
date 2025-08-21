@@ -26,7 +26,7 @@ export class Participation {
   @Column({ type: 'datetime', nullable: true })
   validatedAt: Date | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'boolean', nullable: true, default: null })
   validationSuccess: boolean | null;
 
   @ManyToOne(() => User, (user) => user.participations)
