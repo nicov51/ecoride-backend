@@ -26,14 +26,15 @@ export class ParticipationsService {
     private userRepo: Repository<User>,
     @InjectRepository(Ride)
     private rideRepo: Repository<Ride>,
-    @InjectRepository(Transaction) // ✅ Ajout de cette injection
+    @InjectRepository(Transaction)
     private transactionRepo: Repository<Transaction>,
     private dataSource: DataSource,
   ) {}
+
   async create(
     dto: CreateParticipationDto & { userId: number },
   ): Promise<ParticipationResponseDto> {
-    // 1. Vérifier si l'user participe déjà à ce trajet
+    // 1. Vérif si l'user participe déjà à ce trajet
     const alreadyParticipating = await this.participationRepo.findOne({
       where: {
         user: { id: dto.userId },
@@ -45,10 +46,10 @@ export class ParticipationsService {
       throw new ConflictException('Vous participez déjà à ce trajet');
     }
 
-    // 2. Récupérer l'utilisateur avec son wallet
+    // 2. Récupére l'utilisateur avec son wallet
     const user = await this.userRepo.findOne({
       where: { id: dto.userId },
-      relations: ['wallet'], // On charge la relation wallet
+      relations: ['wallet'],
     });
 
     if (!user) {
@@ -62,7 +63,7 @@ export class ParticipationsService {
     // 3. Récupérer le trajet avec le driver et son wallet
     const ride = await this.rideRepo.findOne({
       where: { id: dto.rideId },
-      relations: ['driver', 'driver.wallet'], // On charge driver ET son wallet
+      relations: ['driver', 'driver.wallet'],
     });
 
     if (!ride) {
@@ -80,10 +81,10 @@ export class ParticipationsService {
       );
     }
 
-    // 5. Calculer les coûts selon la spec US6
-    const rideCost = ride.price; // Prix fixé par le chauffeur
-    const platformCommission = 2; // 2 crédits pour la plateforme
-    const totalCost = rideCost + platformCommission; // Coût total pour le passager
+    // 5. Calcul coûts selon US6
+    const rideCost = ride.price;
+    const platformCommission = 2; // 🟢 GARDER tes 2 crédits fixes
+    const totalCost = rideCost + platformCommission;
 
     // 6. Vérifier si l'utilisateur a assez de crédits
     if (user.wallet.balance < totalCost) {
@@ -93,7 +94,7 @@ export class ParticipationsService {
       );
     }
 
-    // 7. Vérifier s'il reste des places disponibles
+    // 7. Vérif s'il reste des places disponibles
     const currentParticipations = await this.participationRepo.count({
       where: { ride: { id: dto.rideId } },
     });
@@ -109,7 +110,9 @@ export class ParticipationsService {
         ride: ride,
         user: user,
         joinedAt: new Date(),
-        status: ParticipationStatus.CONFIRMED, // Direct confirmation selon US6
+        status: ParticipationStatus.CONFIRMED,
+        validatedAt: null, //  Pas encore validé
+        validationSuccess: null, //  En attente
       });
 
       const savedParticipation = await manager.save(
@@ -121,54 +124,33 @@ export class ParticipationsService {
       user.wallet.balance -= totalCost;
       await manager.save(user.wallet);
 
-      // 8c. Créditer le conducteur (prix du trajet seulement)
-      ride.driver.wallet.balance += rideCost;
-      await manager.save(ride.driver.wallet);
+      // on ne crédite pas le conducteur maintenant
+      // ride.driver.wallet.balance += rideCost;
+      // await manager.save(ride.driver.wallet);
 
-      // 8d. Récupérer la plateforme et créditer sa commission
+      // 8d. Récupérer la plateforme
       const platform = await manager.findOne(Platform, {
         where: { id: 1 },
         relations: ['wallet'],
       });
 
       if (platform?.wallet) {
-        platform.wallet.balance += platformCommission;
-        await manager.save(platform.wallet);
+        // on ne credite plus la plateforme maintenant
+        // platform.wallet.balance += platformCommission;
+        // await manager.save(platform.wallet);
 
-        // 8e. Créer les transactions pour la traçabilité
-        // Todo transfere ça au service transaction
-        // Transaction du passager (débit)
+        // 8e. Créer transaction du passager en "pending"
         const passengerTransaction: Transaction = this.transactionRepo.create({
           wallet: user.wallet,
           platform: platform,
           amount: -totalCost,
-          type: 'ride_participation',
+          type: 'ride_participation_pending', // 🆕 Type en attente
           date: new Date(),
-          description: `Participation au trajet #${ride.id} - ${ride.departurePlace} → ${ride.arrivalPlace}`,
+          description: `Participation au trajet #${ride.id} - Paiement en attente de validation`,
         });
         await manager.save(passengerTransaction);
 
-        // Transaction du conducteur (crédit)
-        const driverTransaction: Transaction = this.transactionRepo.create({
-          wallet: ride.driver.wallet,
-          platform: platform,
-          amount: rideCost,
-          type: 'ride_earning',
-          date: new Date(),
-          description: `Paiement trajet #${ride.id} - passager: ${user.pseudo}`,
-        });
-        await manager.save(driverTransaction);
-
-        // Transaction de la plateforme (commission)
-        const platformTransaction: Transaction = this.transactionRepo.create({
-          wallet: platform.wallet,
-          platform: platform,
-          amount: platformCommission,
-          type: 'platform_commission',
-          date: new Date(),
-          description: `Commission trajet #${ride.id}`,
-        });
-        await manager.save(platformTransaction);
+        // les autres transactions attendront la fin du trajet
       }
 
       // 8f. Recharger la participation avec toutes les relations pour la réponse

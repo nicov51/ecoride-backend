@@ -19,6 +19,8 @@ import { AdminModule } from './modules/admin/admin.module';
 import { EmployeeModule } from './modules/employee/employee.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
+import { RideValidationModule } from './modules/ride-validation/ride-validation.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { TransactionModule } from './modules/transaction/transaction.module';
     EmployeeModule,
     ReviewsModule,
     TransactionModule,
+    RideValidationModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

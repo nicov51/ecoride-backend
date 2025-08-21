@@ -13,18 +13,6 @@ export class Transaction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Wallet, (wallet) => wallet.transactions, {
-    eager: true,
-  })
-  @JoinColumn({ name: 'wallet_id' })
-  wallet: Wallet;
-
-  @ManyToOne(() => Platform, (platform) => platform.transactions, {
-    eager: true,
-  })
-  @JoinColumn({ name: 'platform_id' })
-  platform: Platform;
-
   @Column('float')
   amount: number;
 
@@ -36,4 +24,23 @@ export class Transaction {
 
   @Column()
   description: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['pending', 'completed', 'cancelled'],
+    default: 'completed',
+  })
+  status: string;
+
+  @ManyToOne(() => Wallet, (wallet) => wallet.transactions, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'wallet_id' })
+  wallet: Wallet;
+
+  @ManyToOne(() => Platform, (platform) => platform.transactions, {
+    eager: true,
+  })
+  @JoinColumn({ name: 'platform_id' })
+  platform: Platform;
 }
