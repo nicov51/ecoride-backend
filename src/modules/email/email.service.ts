@@ -1,46 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ContactFormData } from '../../dto/contact.types';
+import { RgpdRequestData } from '../../dto/rgpd.types';
 
 @Injectable()
 export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  // Todo: on va plutot gerer ça en messagerie interne!
-  // async sendRideValidationRequest(
-  //   ride: Ride,
-  //   participant: User,
-  // ): Promise<void> {
-  //   try {
-  //     await this.mailerService.sendMail({
-  //       to: participant.email,
-  //       subject: `Validation requise - Trajet ${ride.departurePlace} → ${ride.arrivalPlace}`,
-  //       html: `
-  //         <h2>Bonjour ${participant.pseudo},</h2>
-  //         <p>Votre trajet du ${ride.departureDateTime.toLocaleDateString(
-  //           'fr-FR',
-  //           {
-  //             year: 'numeric',
-  //             month: 'long',
-  //             day: 'numeric',
-  //             hour: '2-digit',
-  //             minute: '2-digit',
-  //           },
-  //         )} est terminé !</p>
-  //         <p><strong>Trajet :</strong> ${ride.departurePlace} → ${ride.arrivalPlace}</p>
-  //         <p><strong>Conducteur :</strong> ${ride.driver.pseudo}</p>
-  //         <p>Merci de vous rendre sur votre espace pour confirmer que tout s'est bien passé.</p>
-  //         <a href="${process.env.FRONTEND_URL}/rides/${ride.id}/validate"
-  //            style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-  //           Valider le trajet
-  //         </a>
-  //         <p>L'équipe EcoRide</p>
-  //       `,
-  //     });
-  //   } catch (error) {
-  //     console.error('Erreur envoi email:', error);
-  //     // Ne pas faire planter l'app si l'email échoue
-  //   }
-  // }
   async sendTestEmail(to: string): Promise<void> {
     try {
       await this.mailerService.sendMail({
@@ -60,53 +26,91 @@ export class EmailService {
       throw error;
     }
   }
-  //Todo: Email de confirmation d'inscription
-  // async sendRegistrationConfirmation(
-  //   user: { email: string; pseudo: string },
-  //   token: string,
-  // ): Promise<void> {
-  //   try {
-  //     await this.mailerService.sendMail({
-  //       to: user.email,
-  //       subject: 'Confirmer votre inscription - EcoRide',
-  //       html: `
-  //         <h2>Bienvenue ${user.pseudo} !</h2>
-  //         <p>Merci de vous être inscrit sur EcoRide.</p>
-  //         <p>Pour activer votre compte, cliquez sur le lien ci-dessous :</p>
-  //         <a href="${process.env.FRONTEND_URL}/confirm-email?token=${token}"
-  //            style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-  //           Confirmer mon email
-  //         </a>
-  //         <p>Ce lien expire dans 24h.</p>
-  //         <p>L'équipe EcoRide</p>
-  //       `,
-  //     });
-  //   } catch (error) {
-  //     console.error('Erreur envoi email confirmation:', error);
-  //   }
-  // }
-  // async sendPasswordReset(
-  //   user: { email: string; pseudo: string },
-  //   token: string,
-  // ): Promise<void> {
-  //   try {
-  //     await this.mailerService.sendMail({
-  //       to: user.email,
-  //       subject: 'Réinitialisation de mot de passe - EcoRide',
-  //       html: `
-  //         <h2>Bonjour ${user.pseudo},</h2>
-  //         <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
-  //         <a href="${process.env.FRONTEND_URL}/reset-password?token=${token}"
-  //            style="background-color: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-  //           Changer mon mot de passe
-  //         </a>
-  //         <p>Ce lien expire dans 1h.</p>
-  //         <p>Si vous n'avez pas demandé cette réinitialisation, ignorez ce message.</p>
-  //         <p>L'équipe EcoRide</p>
-  //       `,
-  //     });
-  //   } catch (error) {
-  //     console.error('❌ Erreur envoi email reset:', error);
-  //   }
-  // }
+
+  //Email de contact
+  async sendContactMessage(contactData: ContactFormData): Promise<void> {
+    try {
+      await this.mailerService.sendMail({
+        to: process.env.ADMIN_EMAIL, // aecoride@gmail.com
+        from: `"EcoRide Contact" <${process.env.SMTP_USER}>`,
+        subject: `[Contact EcoRide] ${contactData.subject}`,
+        html: `
+          <h3>Nouveau message de contact EcoRide</h3>
+          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px;">
+            <p><strong>Nom :</strong> ${contactData.name}</p>
+            <p><strong>Email :</strong> ${contactData.email}</p>
+            <p><strong>Sujet :</strong> ${contactData.subject}</p>
+          </div>
+          <div style="margin-top: 20px;">
+            <h4>Message :</h4>
+            <p style="background: white; padding: 15px; border-left: 4px solid #4CAF50;">
+              ${contactData.message.replace(/\n/g, '<br>')}
+            </p>
+          </div>
+          <hr>
+          <p style="color: #666; font-size: 12px;">
+            Reçu le ${new Date().toLocaleString('fr-FR')}<br>
+            Depuis le site EcoRide
+          </p>
+        `,
+        // L'utilisateur peut répondre directement à son email.
+        replyTo: contactData.email,
+      });
+      console.log('Message de contact envoyé avec succès');
+    } catch (error) {
+      console.error('Erreur envoi message de contact:', error);
+      throw error;
+    }
+  }
+  //Email demande RGPD
+  async sendRgpdRequest(requestData: RgpdRequestData): Promise<void> {
+    const typeLabels = {
+      access: 'Accès aux données personnelles',
+      rectification: 'Rectification des données',
+      erasure: "Suppression des données (droit à l'oubli)",
+      portability: 'Portabilité des données',
+      opposition: 'Opposition au traitement',
+    };
+
+    try {
+      await this.mailerService.sendMail({
+        to: process.env.ADMIN_EMAIL,
+        from: `"EcoRide RGPD" <${process.env.SMTP_USER}>`,
+        subject: `[RGPD] Demande ${requestData.requestType.toUpperCase()}`,
+        html: `
+          <h3>Nouvelle demande RGPD - EcoRide</h3>
+          <div style="background: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107;">
+            <p><strong>Email du demandeur :</strong> ${requestData.email}</p>
+            <p><strong>Type de demande :</strong> ${typeLabels[requestData.requestType]}</p>
+            ${
+              requestData.description
+                ? `
+              <div style="margin-top: 15px;">
+                <h4>Description :</h4>
+                <p style="background: white; padding: 10px; border-radius: 4px;">
+                  ${requestData.description}
+                </p>
+              </div>
+            `
+                : ''
+            }
+          </div>
+          <div style="margin-top: 20px; padding: 15px; background: #e7f3ff; border-radius: 4px;">
+            <h4>Délai légal de réponse : 1 mois</h4>
+            <p>Cette demande doit être traitée avant le <strong>${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</strong></p>
+          </div>
+          <hr>
+          <p style="color: #666; font-size: 12px;">
+            Reçu le ${new Date().toLocaleString('fr-FR')}<br>
+            Demande RGPD EcoRide
+          </p>
+        `,
+        replyTo: requestData.email,
+      });
+      console.log('Demande RGPD envoyée avec succès');
+    } catch (error) {
+      console.error('Erreur envoi demande RGPD:', error);
+      throw error;
+    }
+  }
 }

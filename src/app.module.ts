@@ -21,6 +21,8 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { RideValidationModule } from './modules/ride-validation/ride-validation.module';
 import { EmailModule } from './modules/email/email.module';
+import { ContactController } from './shared/contact/contact.controller';
+import { RgpdController } from './shared/rgpd/rgpd.controller';
 
 @Module({
   imports: [
@@ -57,7 +59,7 @@ import { EmailModule } from './modules/email/email.module';
     RideValidationModule,
     EmailModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, ContactController, RgpdController],
   providers: [AppService],
 })
 export class AppModule {}
