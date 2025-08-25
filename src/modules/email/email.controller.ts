@@ -6,7 +6,11 @@ export class EmailController {
   constructor(private readonly emailService: EmailService) {}
   @Post('test')
   async sendTestEmail(@Body() body: { to: string }) {
-    await this.emailService.sendTestEmail(body.to);
-    return { message: 'Email de test envoyé' };
+    try {
+      await this.emailService.sendTestEmail(body.to);
+      return { message: 'Email de test envoyé avec succès!' };
+    } catch (error) {
+      throw error;
+    }
   }
 }
