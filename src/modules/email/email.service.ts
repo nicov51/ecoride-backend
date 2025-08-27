@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ContactFormData } from '../../dto/contact.types';
 import { RgpdRequestData } from '../../dto/rgpd.types';
+import {
+  RideCancellationEmailData,
+  RideCompletedEmailData,
+} from '../../dto/email';
 
 @Injectable()
 export class EmailService {
@@ -111,6 +115,41 @@ export class EmailService {
     } catch (error) {
       console.error('Erreur envoi demande RGPD:', error);
       throw error;
+    }
+  }
+
+  async sendRideCompleted(data: RideCompletedEmailData) {
+    const subject = 'Trajet terminé - Validez votre expérience';
+    // on invite chaque participant à valider le trajet
+    for (const participant of data.participants) {
+      await this.mailerService.sendMail({
+        to: participant.email,
+        subject,
+        html: `
+         <h2>Trajet terminé !</h2>
+        <p>Bonjour ${participant.name},</p>
+        <p>Le trajet "${data.rideTitle}" avec ${data.driverName} est terminé.</p>
+        <p>👉 Connectez-vous pour valider votre expérience !</p>
+        `,
+      });
+    }
+  }
+
+  async sendRideCancellation(data: RideCancellationEmailData) {
+    const subject = `Trajet annulé - ${data.rideTitle}`;
+    //On prévient tous les participants :
+    for (const participant of data.participants) {
+      await this.mailerService.sendMail({
+        to: participant.email,
+        subject,
+        html: `
+         <h2>Trajet annulé</h2>
+        <p>Bonjour ${participant.name},</p>
+        <p><strong>Le trajet "${data.rideTitle}" prévu le ${data.departureDate} a été annulé.</strong></p>
+        ${data.reason ? `<p><em>Raison : ${data.reason}</em></p>` : ''}
+        <p>Désolé pour le désagrément !</p>
+        `,
+      });
     }
   }
 }

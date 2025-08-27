@@ -7,13 +7,14 @@ import { Participation } from '../../models/participation.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../models/user.entity';
 import { Car } from '../../models/car.entity';
+import { EmailService } from '../email/email.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Ride, CarpoolZone, Car, Participation, User]),
   ],
   controllers: [RidesController],
-  providers: [RidesService],
+  providers: [RidesService, EmailService],
   exports: [RidesService],
 })
 export class RidesModule {}
