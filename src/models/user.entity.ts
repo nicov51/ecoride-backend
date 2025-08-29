@@ -77,7 +77,7 @@ export class User {
   @OneToOne(() => Wallet, (wallet) => wallet.user, { onDelete: 'CASCADE' })
   wallet: Wallet;
 
-  @OneToMany(() => Notification, (notif) => notif.user)
+  @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
 
   @OneToMany(() => Car, (car) => car.owner)

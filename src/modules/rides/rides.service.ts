@@ -12,6 +12,8 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RideResponseDto } from '../../dto/ride-response.dto';
 import { RideFiltersDto } from '../../dto/ride-filters.dto';
+import { EmailService } from '../email/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class RidesService {
@@ -24,6 +26,8 @@ export class RidesService {
     private carRepo: Repository<Car>,
     @InjectRepository(CarpoolZone)
     private carpoolZoneRepo: Repository<CarpoolZone>,
+    private emailService: EmailService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(dto: CreateRideDto): Promise<RideResponseDto> {
@@ -211,27 +215,9 @@ export class RidesService {
       });
     }
 
-    // Ajouter 'rating' à ton User.
-    // if (filters.minDriverRating) {
-    //   query.andWhere('driver.rating >= :minDriverRating', {
-    //     minDriverRating: filters.minDriverRating,
-    //   });
-    // }
-
     // Tri par défaut
     query.addOrderBy('ride.departureDateTime', 'ASC');
   }
-
-  // async getLastRidePreferences(
-  //   userId: number,
-  // ): Promise<RidePreferences | undefined> {
-  //   const lastRide = await this.rideRepo.findOne({
-  //     where: { driver: { id: userId } },
-  //     order: { id: 'DESC' },
-  //     select: ['preferences'],
-  //   });
-  //   return lastRide?.preferences;
-  // }
   async startRide(rideId: number, driverId: number): Promise<void> {
     const ride = await this.rideRepo.findOne({
       where: { id: rideId, driver: { id: driverId } },
@@ -244,12 +230,21 @@ export class RidesService {
     ride.status = 'in_progress';
     ride.startedAt = new Date();
     await this.rideRepo.save(ride);
+
+    const rideTitle = `${ride.departurePlace} → ${ride.arrivalPlace}`;
+    for (const participation of ride.participations) {
+      await this.notificationsService.notifyRideStarted(
+        participation.user.id,
+        rideTitle,
+        rideId,
+      );
+    }
   }
 
   async completeRide(rideId: number, driverId: number): Promise<void> {
     const ride = await this.rideRepo.findOne({
       where: { id: rideId, driver: { id: driverId } },
-      relations: ['participations', 'participations.user'],
+      relations: ['participations', 'participations.user', 'driver'],
     });
 
     if (!ride) throw new NotFoundException('Trajet non trouvé');
@@ -260,13 +255,52 @@ export class RidesService {
     ride.completedAt = new Date();
     await this.rideRepo.save(ride);
 
-    // 📧 Envoyer emails aux participants pour validation
-    this.sendValidationEmails(ride);
+    //Envoyer emails aux participants pour validation
+    await this.sendValidationEmails(ride);
   }
 
-  private sendValidationEmails(ride: Ride): void {
-    // TODO: Implémenter l'envoi d'emails
-    // Pour chaque participant, envoyer un email avec lien vers validation
-    console.log(ride);
+  private async sendValidationEmails(ride: Ride): Promise<void> {
+    const emailData = {
+      rideTitle: `${ride.departurePlace} -> ${ride.arrivalPlace}`,
+      driverName: ride.driver.name,
+      participants: ride.participations.map((p) => ({
+        email: p.user.email,
+        name: p.user.name,
+      })),
+      rideId: ride.id,
+    };
+    await this.emailService.sendRideCompleted(emailData);
+  }
+
+  async cancelRide(
+    rideId: number,
+    driverId: number,
+    reason?: string,
+  ): Promise<void> {
+    const ride = await this.rideRepo.findOne({
+      where: { id: rideId, driver: { id: driverId } },
+      relations: ['participations', 'participations.user', 'driver'],
+    });
+
+    if (!ride) throw new NotFoundException('Trajet non trouvé');
+    if (ride.status === 'completed')
+      throw new ConflictException('Trajet déjà terminé');
+
+    ride.status = 'cancelled';
+    await this.rideRepo.save(ride);
+
+    //Envoyer emails d'annulation
+    const emailData = {
+      rideTitle: `${ride.departurePlace} → ${ride.arrivalPlace}`,
+      driverName: ride.driver.name,
+      participants: ride.participations.map((p) => ({
+        email: p.user.email,
+        name: p.user.name,
+      })),
+      departureDate: ride.departureDateTime.toLocaleDateString('fr-FR'),
+      reason,
+    };
+
+    await this.emailService.sendRideCancellation(emailData);
   }
 }

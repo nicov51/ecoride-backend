@@ -23,6 +23,7 @@ import { RideValidationModule } from './modules/ride-validation/ride-validation.
 import { EmailModule } from './modules/email/email.module';
 import { ContactController } from './shared/contact/contact.controller';
 import { RgpdController } from './shared/rgpd/rgpd.controller';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { RgpdController } from './shared/rgpd/rgpd.controller';
     TransactionModule,
     RideValidationModule,
     EmailModule,
+    NotificationsModule,
   ],
   controllers: [AppController, ContactController, RgpdController],
   providers: [AppService],
