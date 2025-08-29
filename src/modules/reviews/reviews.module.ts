@@ -6,9 +6,14 @@ import { Review } from '../../models/review.entity';
 import { Ride } from '../../models/ride.entity';
 import { User } from '../../models/user.entity';
 import { AuthModule } from '../auth/auth.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Review, User, Ride]), AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Review, User, Ride]),
+    NotificationsModule,
+    AuthModule,
+  ],
   providers: [ReviewsService],
   controllers: [ReviewsController],
   exports: [ReviewsService],

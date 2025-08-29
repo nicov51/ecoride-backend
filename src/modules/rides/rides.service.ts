@@ -245,7 +245,7 @@ export class RidesService {
     await this.rideRepo.save(ride);
 
     //Envoyer emails aux participants pour validation
-    this.sendValidationEmails(ride);
+    await this.sendValidationEmails(ride);
   }
 
   private async sendValidationEmails(ride: Ride): Promise<void> {

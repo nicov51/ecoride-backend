@@ -7,6 +7,7 @@ import { Ride } from '../../models/ride.entity';
 import { ReviewResponse } from '../../dto/review-response.dto';
 import { UpdateReviewStatusDto } from '../../dto/update-review-status.dto';
 import { CreateReviewDTO } from '../../dto/create-review.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ReviewsService {
@@ -17,6 +18,7 @@ export class ReviewsService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Ride)
     private readonly ridesRepository: Repository<Ride>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(userId: number, dto: CreateReviewDTO): Promise<ReviewResponse> {
@@ -25,7 +27,7 @@ export class ReviewsService {
 
     const ride = await this.ridesRepository.findOne({
       where: { id: dto.rideId },
-      relations: ['participations', 'participations.user'],
+      relations: ['participations', 'participations.user', 'driver'],
     });
     if (!ride) throw new NotFoundException('Trajet non trouvé');
 
@@ -51,6 +53,14 @@ export class ReviewsService {
       await this.ridesRepository.save(ride);
     }
     const savedReview = await this.reviewsRepository.save(review);
+
+    //notification pour le chauffeur qu'un avis a été deposé
+    const rideTitle = `${ride.departurePlace} → ${ride.arrivalPlace}`;
+    await this.notificationsService.notifyDriverOfNewReview(
+      ride.driver.id, // Il faut loader le driver dans la relation
+      savedReview.id,
+      rideTitle,
+    );
     return new ReviewResponse(savedReview);
   }
 
@@ -79,7 +89,10 @@ export class ReviewsService {
     dto: UpdateReviewStatusDto,
   ): Promise<ReviewResponse> {
     // on recup l'avis
-    const review = await this.reviewsRepository.findOneBy({ id: reviewId });
+    const review = await this.reviewsRepository.findOne({
+      where: { id: reviewId },
+      relations: ['user'],
+    });
     if (!review) throw new NotFoundException('avis non trouvé');
 
     // on met a jour le status
@@ -92,6 +105,20 @@ export class ReviewsService {
     //on pourrait maj isReported si + de pb en attente
 
     const updatedReview = await this.reviewsRepository.save(review);
+
+    // NOTIFICATIONS selon le statut
+    if (dto.status === ReviewStatus.APPROVED) {
+      await this.notificationsService.notifyReviewApproved(
+        review.user.id,
+        reviewId,
+      );
+    } else if (dto.status === ReviewStatus.REJECTED) {
+      await this.notificationsService.notifyReviewRejected(
+        review.user.id,
+        reviewId,
+        dto.reason,
+      );
+    }
     return new ReviewResponse(updatedReview);
   }
 }
