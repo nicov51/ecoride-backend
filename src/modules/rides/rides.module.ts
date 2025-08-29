@@ -8,10 +8,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../models/user.entity';
 import { Car } from '../../models/car.entity';
 import { EmailService } from '../email/email.service';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Ride, CarpoolZone, Car, Participation, User]),
+    NotificationsModule,
   ],
   controllers: [RidesController],
   providers: [RidesService, EmailService],

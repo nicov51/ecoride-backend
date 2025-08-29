@@ -13,6 +13,7 @@ import { CreateRideDto } from '../../dto/create-ride.dto';
 import { RideResponseDto } from '../../dto/ride-response.dto';
 import { RideFiltersDto } from '../../dto/ride-filters.dto';
 import { EmailService } from '../email/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class RidesService {
@@ -26,6 +27,7 @@ export class RidesService {
     @InjectRepository(CarpoolZone)
     private carpoolZoneRepo: Repository<CarpoolZone>,
     private emailService: EmailService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(dto: CreateRideDto): Promise<RideResponseDto> {
@@ -228,6 +230,15 @@ export class RidesService {
     ride.status = 'in_progress';
     ride.startedAt = new Date();
     await this.rideRepo.save(ride);
+
+    const rideTitle = `${ride.departurePlace} → ${ride.arrivalPlace}`;
+    for (const participation of ride.participations) {
+      await this.notificationsService.notifyRideStarted(
+        participation.user.id,
+        rideTitle,
+        rideId,
+      );
+    }
   }
 
   async completeRide(rideId: number, driverId: number): Promise<void> {

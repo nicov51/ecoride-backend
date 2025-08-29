@@ -64,6 +64,21 @@ export class NotificationsService {
     });
   }
 
+  async notifyRideStarted(
+    userId: number,
+    rideTitle: string,
+    rideId: number,
+  ): Promise<void> {
+    const message = `Votre trajet "${rideTitle}" a démarré !`;
+
+    await this.notificationsRepository.save({
+      userId,
+      message,
+      type: NotificationType.RIDE_STARTED,
+      relatedId: rideId,
+    });
+  }
+
   // Marquer comme lu
   async markAsRead(notificationId: number): Promise<void> {
     await this.notificationsRepository.update(notificationId, { isRead: true });
